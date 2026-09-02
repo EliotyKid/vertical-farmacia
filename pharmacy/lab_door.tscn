@@ -1,0 +1,86 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://pharmacy/lab_door.gd" id="1_door"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+
+[sub_resource type="BoxMesh" id="DoorMesh"]
+size = Vector3(4.8, 3.2, 0.22)
+
+[sub_resource type="BoxShape3D" id="DoorShape"]
+size = Vector3(4.8, 3.2, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="DoorMaterial"]
+albedo_color = Color(0.22, 0.29, 0.34, 1)
+metallic = 0.35
+roughness = 0.58
+
+[sub_resource type="BoxMesh" id="PanelMesh"]
+size = Vector3(0.48, 0.7, 0.22)
+
+[sub_resource type="BoxShape3D" id="PanelShape"]
+size = Vector3(0.48, 0.7, 0.32)
+
+[sub_resource type="StandardMaterial3D" id="PanelMaterial"]
+albedo_color = Color(0.12, 0.38, 0.32, 1)
+emission_enabled = true
+emission = Color(0.04, 0.24, 0.17, 1)
+
+[node name="LabDoor" type="Node3D"]
+script = ExtResource("1_door")
+
+[node name="DoorBody" type="AnimatableBody3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.6, 0)
+sync_to_physics = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DoorBody"]
+mesh = SubResource("DoorMesh")
+material_override = SubResource("DoorMaterial")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorBody"]
+shape = SubResource("DoorShape")
+
+[node name="OutsideControlPanel" type="StaticBody3D" parent="."]
+position = Vector3(2.85, 1.15, 0.22)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OutsideControlPanel"]
+mesh = SubResource("PanelMesh")
+material_override = SubResource("PanelMaterial")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OutsideControlPanel"]
+shape = SubResource("PanelShape")
+
+[node name="StatusLabel" type="Label3D" parent="OutsideControlPanel"]
+position = Vector3(0, 0.62, 0)
+text = "LAB ABERTO"
+font_size = 27
+outline_size = 7
+billboard = 0
+no_depth_test = true
+
+[node name="Interactable" type="Node" parent="OutsideControlPanel"]
+script = ExtResource("2_interactable")
+interaction_text = "Fechar laboratório"
+
+[node name="InsideControlPanel" type="StaticBody3D" parent="."]
+position = Vector3(2.85, 1.15, -0.22)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="InsideControlPanel"]
+mesh = SubResource("PanelMesh")
+material_override = SubResource("PanelMaterial")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InsideControlPanel"]
+shape = SubResource("PanelShape")
+
+[node name="StatusLabel" type="Label3D" parent="InsideControlPanel"]
+rotation = Vector3(0, 3.14159, 0)
+position = Vector3(0, 0.62, 0)
+text = "LAB ABERTO"
+font_size = 27
+outline_size = 7
+billboard = 0
+no_depth_test = true
+
+[node name="Interactable" type="Node" parent="InsideControlPanel"]
+script = ExtResource("2_interactable")
+interaction_text = "Fechar laboratório"

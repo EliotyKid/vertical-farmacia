@@ -1,10 +1,13 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://crafting/station_input.gd" id="1_station"]
 [ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
 [ext_resource type="PackedScene" path="res://items/world_item.tscn" id="3_world_item"]
 [ext_resource type="Resource" path="res://data/recipes/experimental_medicine.tres" id="4_recipe"]
 [ext_resource type="PackedScene" path="res://crafting/explosion.tscn" id="5_explosion"]
+[ext_resource type="Resource" path="res://data/recipes/focus_syrup.tres" id="6_focus"]
+[ext_resource type="Resource" path="res://data/recipes/nimbus_elixir.tres" id="7_nimbus"]
+[ext_resource type="Resource" path="res://data/recipes/lunar_compound.tres" id="8_lunar"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_cauldron"]
 top_radius = 0.82
@@ -40,11 +43,12 @@ emission_energy_multiplier = 1.5
 
 [node name="StationInput" type="StaticBody3D"]
 script = ExtResource("1_station")
-recipes = [ExtResource("4_recipe")]
+recipes = [ExtResource("4_recipe"), ExtResource("6_focus"), ExtResource("7_nimbus"), ExtResource("8_lunar")]
 world_item_scene = ExtResource("3_world_item")
 explosion_scene = ExtResource("5_explosion")
 
 [node name="CauldronMesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
 mesh = SubResource("CylinderMesh_cauldron")
 material_override = SubResource("Material_cauldron")
 

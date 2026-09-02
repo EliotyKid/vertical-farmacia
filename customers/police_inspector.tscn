@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://customers/police_inspector.gd" id="1_police"]
+
+[sub_resource type="CapsuleShape3D" id="PoliceShape"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="PoliceMesh"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="PoliceMaterial"]
+albedo_color = Color(0.12, 0.25, 0.58, 1)
+roughness = 0.78
+
+[sub_resource type="CylinderMesh" id="HatMesh"]
+top_radius = 0.36
+bottom_radius = 0.36
+height = 0.14
+
+[node name="PoliceInspector" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_police")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("PoliceShape")
+
+[node name="BodyMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("PoliceMesh")
+material_override = SubResource("PoliceMaterial")
+
+[node name="Hat" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.05, 0)
+mesh = SubResource("HatMesh")
+material_override = SubResource("PoliceMaterial")
+
+[node name="StateLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.65, 0)
+text = "POLÍCIA"
+font_size = 30
+outline_size = 8
+billboard = 1
+no_depth_test = true

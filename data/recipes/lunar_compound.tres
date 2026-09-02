@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeData" load_steps=6 format=3]
+[ext_resource type="Script" path="res://crafting/recipe_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/items/lunar_sap.tres" id="2"]
+[ext_resource type="Resource" path="res://data/items/nimbus_crystal.tres" id="3"]
+[ext_resource type="Resource" path="res://data/items/golden_spore.tres" id="4"]
+[ext_resource type="Resource" path="res://data/items/lunar_compound.tres" id="5"]
+[resource]
+script = ExtResource("1")
+id = &"lunar_compound"
+display_name = "Composto Lunar"
+required_ingredients = [ExtResource("2"), ExtResource("3"), ExtResource("4")]
+output_item = ExtResource("5")
+craft_time = 6.0
+station_type = 0

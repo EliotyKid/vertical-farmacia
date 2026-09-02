@@ -1,0 +1,69 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://crafting/press_station.gd" id="1_press"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="PackedScene" path="res://items/world_item.tscn" id="3_item"]
+[ext_resource type="Resource" path="res://data/recipes/nimbus_tablet.tres" id="4_recipe"]
+
+[sub_resource type="BoxMesh" id="BodyMesh"]
+size = Vector3(1.5, 1.5, 1.0)
+[sub_resource type="BoxShape3D" id="BodyShape"]
+size = Vector3(1.5, 1.5, 1.0)
+[sub_resource type="StandardMaterial3D" id="BodyMaterial"]
+albedo_color = Color(0.38, 0.28, 0.2, 1)
+metallic = 0.45
+roughness = 0.58
+[sub_resource type="BoxMesh" id="LeverMesh"]
+size = Vector3(0.14, 1.0, 0.14)
+[sub_resource type="StandardMaterial3D" id="LeverMaterial"]
+albedo_color = Color(0.86, 0.36, 0.16, 1)
+[sub_resource type="SphereMesh" id="SlotMesh"]
+radius = 0.1
+height = 0.2
+[sub_resource type="StandardMaterial3D" id="SlotMaterial"]
+albedo_color = Color(0.3, 0.9, 0.7, 1)
+emission_enabled = true
+emission = Color(0.1, 0.45, 0.3, 1)
+
+[node name="PressStation" type="StaticBody3D"]
+script = ExtResource("1_press")
+recipes = [ExtResource("4_recipe")]
+world_item_scene = ExtResource("3_item")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = SubResource("BodyMesh")
+material_override = SubResource("BodyMaterial")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BodyShape")
+[node name="Lever" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0.55, 1.0, 0.25)
+mesh = SubResource("LeverMesh")
+material_override = SubResource("LeverMaterial")
+[node name="InputSlot1" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(-0.3, 0.9, 0.55)
+[node name="Marker" type="MeshInstance3D" parent="InputSlot1"]
+mesh = SubResource("SlotMesh")
+material_override = SubResource("SlotMaterial")
+[node name="InputSlot2" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0.3, 0.9, 0.55)
+[node name="Marker" type="MeshInstance3D" parent="InputSlot2"]
+mesh = SubResource("SlotMesh")
+material_override = SubResource("SlotMaterial")
+[node name="OutputMarker" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 0.5, 1.2)
+[node name="StatusLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.75, 0)
+text = "PRENSA 0/2"
+font_size = 28
+outline_size = 8
+billboard = 1
+no_depth_test = true
+[node name="Interactable" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_interactable")
+interaction_text = "Usar prensa"

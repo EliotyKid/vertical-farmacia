@@ -1,68 +1,123 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene format=3 uid="uid://b5dkeqkaylqfc"]
 
-[ext_resource type="Script" path="res://levels/pharmacy_test.gd" id="1_level"]
+[ext_resource type="Script" uid="uid://bjtelsymbmi4y" path="res://levels/pharmacy_test.gd" id="1_level"]
 [ext_resource type="PackedScene" path="res://debug/debug_overlay.tscn" id="2_debug"]
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="3_player"]
 [ext_resource type="Resource" path="res://data/items/basic_medicine.tres" id="8_medicine"]
 [ext_resource type="Resource" path="res://data/items/red_ingredient.tres" id="9_red"]
 [ext_resource type="Resource" path="res://data/items/blue_ingredient.tres" id="10_blue"]
-[ext_resource type="PackedScene" path="res://pharmacy/shelf.tscn" id="11_shelf"]
+[ext_resource type="PackedScene" uid="uid://d2bff8m7ye8ur" path="res://pharmacy/shelf.tscn" id="11_shelf"]
+[ext_resource type="Script" uid="uid://bm0wbvglrl4e2" path="res://items/item_data.gd" id="12_qoffl"]
 [ext_resource type="PackedScene" path="res://pharmacy/supplier_terminal.tscn" id="12_terminal"]
 [ext_resource type="PackedScene" path="res://customers/customer.tscn" id="13_customer"]
-[ext_resource type="Script" path="res://customers/customer_spawner.gd" id="14_spawner"]
+[ext_resource type="Script" uid="uid://bt2ksxbkdnhap" path="res://customers/customer_spawner.gd" id="14_spawner"]
 [ext_resource type="PackedScene" path="res://crafting/station_input.tscn" id="15_station_input"]
 [ext_resource type="Resource" path="res://data/items/experimental_medicine.tres" id="16_experimental"]
-[ext_resource type="Script" path="res://feedback/feedback_audio.gd" id="18_feedback_audio"]
-[ext_resource type="Script" path="res://autoload/game_progression.gd" id="19_progression"]
+[ext_resource type="Script" uid="uid://diiiue7uk5tlu" path="res://feedback/feedback_audio.gd" id="18_feedback_audio"]
+[ext_resource type="Script" uid="uid://3hrdr0ceed5s" path="res://autoload/game_progression.gd" id="19_progression"]
 [ext_resource type="PackedScene" path="res://ui/hud.tscn" id="20_hud"]
+[ext_resource type="Resource" path="res://data/items/calm_tonic.tres" id="21_calm"]
+[ext_resource type="Resource" path="res://data/items/solar_lozenges.tres" id="22_solar"]
+[ext_resource type="Resource" path="res://data/items/nimbus_balm.tres" id="23_balm"]
+[ext_resource type="Resource" path="res://data/items/lunar_sap.tres" id="24_sap"]
+[ext_resource type="Resource" path="res://data/items/nimbus_crystal.tres" id="25_crystal"]
+[ext_resource type="Resource" path="res://data/items/golden_spore.tres" id="26_spore"]
+[ext_resource type="Resource" path="res://data/items/focus_syrup.tres" id="27_focus"]
+[ext_resource type="Resource" path="res://data/items/nimbus_elixir.tres" id="28_elixir"]
+[ext_resource type="Resource" path="res://data/items/lunar_compound.tres" id="29_compound"]
+[ext_resource type="PackedScene" path="res://pharmacy/lab_door.tscn" id="30_lab_door"]
+[ext_resource type="Script" uid="uid://bw86c7m50lcbk" path="res://autoload/inspection_manager.gd" id="31_inspection"]
+[ext_resource type="PackedScene" path="res://customers/police_inspector.tscn" id="32_police"]
+[ext_resource type="PackedScene" path="res://pharmacy/upgrade_terminal.tscn" id="35_upgrades"]
+[ext_resource type="Script" uid="uid://cqk6132b4aeoe" path="res://autoload/save_manager.gd" id="36_save"]
+[ext_resource type="Script" uid="uid://c2axoxfagox7y" path="res://debug/playtest_metrics.gd" id="37_metrics"]
 
-[node name="PharmacyTest" type="Node3D"]
+[node name="PharmacyTest" type="Node3D" unique_id=786112716]
 script = ExtResource("1_level")
 
-[node name="GameProgression" type="Node" parent="."]
+[node name="GameProgression" type="Node" parent="." unique_id=325166212]
 script = ExtResource("19_progression")
 
-[node name="FeedbackAudio" type="Node" parent="."]
+[node name="SaveManager" type="Node" parent="." unique_id=1025622844]
+script = ExtResource("36_save")
+
+[node name="InspectionManager" type="Node" parent="." unique_id=1641987019]
+script = ExtResource("31_inspection")
+police_scene = ExtResource("32_police")
+
+[node name="FeedbackAudio" type="Node" parent="." unique_id=1372751148]
 script = ExtResource("18_feedback_audio")
 
-[node name="DebugOverlay" parent="." instance=ExtResource("2_debug")]
+[node name="PlaytestMetrics" type="Node" parent="." unique_id=481296559]
+script = ExtResource("37_metrics")
 
-[node name="HUD" parent="." instance=ExtResource("20_hud")]
+[node name="DebugOverlay" parent="." unique_id=1209690916 instance=ExtResource("2_debug")]
 
-[node name="Player" parent="." instance=ExtResource("3_player")]
-position = Vector3(0, 1, 8)
+[node name="HUD" parent="." unique_id=1028629276 instance=ExtResource("20_hud")]
 
-[node name="Shelves" type="Node3D" parent="."]
+[node name="Player" parent="." unique_id=1440875414 instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 8)
 
-[node name="ShelfLeft" parent="Shelves" instance=ExtResource("11_shelf")]
-position = Vector3(-5.7, 1.25, 5.5)
+[node name="Shelves" type="Node3D" parent="." unique_id=1621713537]
 
-[node name="ShelfRight" parent="Shelves" instance=ExtResource("11_shelf")]
-position = Vector3(5.7, 1.25, 5.5)
+[node name="ShelfLeft" parent="Shelves" unique_id=813803631 instance=ExtResource("11_shelf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.7, 1.25, 5.5)
 
-[node name="IngredientStorage" parent="Shelves" instance=ExtResource("11_shelf")]
-position = Vector3(5.8, 1.25, -7.8)
-accepts_categories = [1]
+[node name="ShelfRight" parent="Shelves" unique_id=794628406 instance=ExtResource("11_shelf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7, 1.25, 5.5)
+
+[node name="IngredientStorage" parent="Shelves" unique_id=208107468 instance=ExtResource("11_shelf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 1.25, -7.8)
+accepts_categories = Array[int]([1])
 storage_name = "armazenamento de ingredientes"
 
-[node name="DeliverySpawn" type="Marker3D" parent="." groups=["delivery_spawn"]]
-position = Vector3(-6.2, 0.55, 8)
+[node name="LabDoor" parent="." unique_id=534389610 instance=ExtResource("30_lab_door")]
 
-[node name="SupplierTerminal" parent="." instance=ExtResource("12_terminal")]
-position = Vector3(3.2, 0.75, 2.85)
-catalog = [ExtResource("8_medicine"), ExtResource("9_red"), ExtResource("10_blue")]
+[node name="UpgradeTerminal" parent="." unique_id=899484495 instance=ExtResource("35_upgrades")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0.75, 2.85)
 
-[node name="CustomerCounterTarget" type="Marker3D" parent="." groups=["customer_counter_target"]]
-position = Vector3(0, 0.9, 3.45)
+[node name="ExtraShelfSpawn" type="Marker3D" parent="." unique_id=1402792788 groups=["upgrade_shelf_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, -8.3)
 
-[node name="CustomerExit" type="Marker3D" parent="." groups=["customer_exit"]]
-position = Vector3(0, 0.9, 9.2)
+[node name="PressSpawn" type="Marker3D" parent="." unique_id=115509831 groups=["upgrade_press_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, 0.75, -5.5)
 
-[node name="CustomerSpawner" type="Node3D" parent="."]
-position = Vector3(0, 0.9, 9.2)
+[node name="DeliverySpawn" type="Marker3D" parent="." unique_id=1844372214 groups=["delivery_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2, 0.55, 8)
+
+[node name="SupplierTerminal" parent="." unique_id=1359512015 instance=ExtResource("12_terminal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.75, 2.85)
+catalog = Array[ExtResource("12_qoffl")]([ExtResource("8_medicine"), ExtResource("21_calm"), ExtResource("22_solar"), ExtResource("23_balm"), ExtResource("9_red"), ExtResource("10_blue"), ExtResource("24_sap"), ExtResource("25_crystal"), ExtResource("26_spore")])
+
+[node name="CustomerCounterTarget" type="Marker3D" parent="." unique_id=1264946223 groups=["customer_counter_target"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 3.45)
+
+[node name="QueuePosition1" type="Marker3D" parent="." unique_id=1536250619 groups=["customer_queue_position"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 3.45)
+
+[node name="QueuePosition2" type="Marker3D" parent="." unique_id=1678780326 groups=["customer_queue_position"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 4.65)
+
+[node name="QueuePosition3" type="Marker3D" parent="." unique_id=1013992980 groups=["customer_queue_position"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 5.85)
+
+[node name="QueuePosition4" type="Marker3D" parent="." unique_id=1811973989 groups=["customer_queue_position"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 7.05)
+
+[node name="CustomerExit" type="Marker3D" parent="." unique_id=1314830523 groups=["customer_exit"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 9.2)
+
+[node name="PoliceSpawn" type="Marker3D" parent="." unique_id=615063296 groups=["police_spawn"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4, 0.9, 9.2)
+
+[node name="PoliceInspectionPoint" type="Marker3D" parent="." unique_id=882718980 groups=["police_inspection_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4, 0.9, 1.6214966)
+
+[node name="CustomerSpawner" type="Node3D" parent="." unique_id=661822803]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 9.2)
 script = ExtResource("14_spawner")
 customer_scene = ExtResource("13_customer")
-order_sequence = [ExtResource("8_medicine"), ExtResource("16_experimental")]
+order_sequence = Array[ExtResource("12_qoffl")]([ExtResource("8_medicine"), ExtResource("21_calm"), ExtResource("22_solar"), ExtResource("23_balm"), ExtResource("16_experimental"), ExtResource("27_focus"), ExtResource("28_elixir"), ExtResource("29_compound")])
 
-[node name="CauldronInput" parent="." instance=ExtResource("15_station_input")]
-position = Vector3(0, 0.58, -5.5)
+[node name="CauldronInput" parent="." unique_id=1409137388 instance=ExtResource("15_station_input")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.58, -5.5)

@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://items/delivery_box.gd" id="1_box"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="PackedScene" path="res://items/world_item.tscn" id="3_world_item"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_box"]
+size = Vector3(0.9, 0.62, 0.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape_box"]
+size = Vector3(0.9, 0.62, 0.7)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_box"]
+friction = 0.9
+bounce = 0.02
+
+[node name="DeliveryBox" type="RigidBody3D"]
+mass = 0.65
+physics_material_override = SubResource("PhysicsMaterial_box")
+continuous_cd = true
+script = ExtResource("1_box")
+world_item_scene = ExtResource("3_world_item")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+mesh = SubResource("BoxMesh_box")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_box")
+
+[node name="NameLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 0.58, 0)
+font_size = 24
+outline_size = 7
+billboard = 1
+no_depth_test = true
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+interaction_text = "Pegar caixa"

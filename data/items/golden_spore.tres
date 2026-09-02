@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://items/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"golden_spore"
+display_name = "Esporo Dourado"
+category = 1
+buy_price = 12
+sell_price = 6
+tags = Array[StringName]([&"fictional_ingredient"])
+placeholder_color = Color(0.95, 0.58, 0.1, 1)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://customers/customer.gd" id="1_customer"]
 [ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
@@ -20,6 +20,15 @@ roughness = 0.82
 top_radius = 0.28
 bottom_radius = 0.28
 height = 0.36
+
+[sub_resource type="BoxMesh" id="PatienceMesh"]
+size = Vector3(0.9, 0.08, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="PatienceMaterial"]
+resource_local_to_scene = true
+albedo_color = Color(0.4, 0.87, 0.51, 1)
+emission_enabled = true
+emission = Color(0.4, 0.87, 0.51, 1)
 
 [node name="Customer" type="CharacterBody3D"]
 collision_layer = 2
@@ -50,6 +59,24 @@ font_size = 32
 outline_size = 8
 billboard = 1
 no_depth_test = true
+
+[node name="PatienceBar" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.42, 0)
+mesh = SubResource("PatienceMesh")
+material_override = SubResource("PatienceMaterial")
+cast_shadow = 0
+
+[node name="PatienceText" type="Label3D" parent="."]
+unique_name_in_owner = true
+visible = false
+position = Vector3(0, 1.29, 0)
+font_size = 22
+outline_size = 6
+billboard = 1
+no_depth_test = true
+text = "45s"
+horizontal_alignment = 1
 
 [node name="Interactable" type="Node" parent="."]
 script = ExtResource("2_interactable")

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RecipeData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://crafting/recipe_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/items/blue_ingredient.tres" id="2"]
+[ext_resource type="Resource" path="res://data/items/lunar_sap.tres" id="3"]
+[ext_resource type="Resource" path="res://data/items/focus_syrup.tres" id="4"]
+[resource]
+script = ExtResource("1")
+id = &"focus_syrup"
+display_name = "Xarope de Foco"
+required_ingredients = [ExtResource("2"), ExtResource("3")]
+output_item = ExtResource("4")
+craft_time = 4.0
+station_type = 0

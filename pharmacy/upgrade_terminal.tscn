@@ -1,0 +1,94 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://pharmacy/upgrade_terminal.gd" id="1_terminal"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="PackedScene" path="res://pharmacy/shelf.tscn" id="3_shelf"]
+[ext_resource type="PackedScene" path="res://crafting/press_station.tscn" id="4_press"]
+[ext_resource type="Resource" path="res://data/items/nimbus_tablet.tres" id="5_tablet"]
+
+[sub_resource type="BoxMesh" id="TerminalMesh"]
+size = Vector3(1.2, 1.5, 0.65)
+[sub_resource type="BoxShape3D" id="TerminalShape"]
+size = Vector3(1.2, 1.5, 0.65)
+[sub_resource type="StandardMaterial3D" id="TerminalMaterial"]
+albedo_color = Color(0.34, 0.18, 0.44, 1)
+emission_enabled = true
+emission = Color(0.13, 0.04, 0.2, 1)
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.07, 0.04, 0.09, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.65, 0.38, 0.8, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="UpgradeTerminal" type="StaticBody3D"]
+script = ExtResource("1_terminal")
+shelf_scene = ExtResource("3_shelf")
+press_scene = ExtResource("4_press")
+press_product = ExtResource("5_tablet")
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("TerminalMesh")
+material_override = SubResource("TerminalMaterial")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("TerminalShape")
+[node name="WorldLabel" type="Label3D" parent="."]
+position = Vector3(0, 0.15, 0.34)
+text = "MELHORIAS"
+font_size = 32
+outline_size = 8
+[node name="Interactable" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_interactable")
+interaction_text = "Abrir melhorias"
+[node name="UpgradeUI" type="CanvasLayer" parent="."]
+layer = 10
+[node name="UpgradeMenu" type="PanelContainer" parent="UpgradeUI"]
+unique_name_in_owner = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -205.0
+offset_right = 240.0
+offset_bottom = 205.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PanelStyle")
+[node name="Margin" type="MarginContainer" parent="UpgradeUI/UpgradeMenu"]
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+[node name="Content" type="VBoxContainer" parent="UpgradeUI/UpgradeMenu/Margin"]
+theme_override_constants/separation = 14
+[node name="Title" type="Label" parent="UpgradeUI/UpgradeMenu/Margin/Content"]
+theme_override_font_sizes/font_size = 25
+text = "Melhorias da Farmácia"
+horizontal_alignment = 1
+[node name="MoneyLabel" type="Label" parent="UpgradeUI/UpgradeMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Saldo: $40"
+horizontal_alignment = 1
+[node name="ShelfButton" type="Button" parent="UpgradeUI/UpgradeMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Prateleira adicional — $80"
+[node name="PressButton" type="Button" parent="UpgradeUI/UpgradeMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Prensa manual — $120"
+[node name="ExpressButton" type="Button" parent="UpgradeUI/UpgradeMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Entrega expressa — $90"
+[node name="FeedbackLabel" type="Label" parent="UpgradeUI/UpgradeMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Escolha como melhorar a farmácia."
+horizontal_alignment = 1
+[node name="CloseButton" type="Button" parent="UpgradeUI/UpgradeMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Fechar"

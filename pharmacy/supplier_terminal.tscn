@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://pharmacy/supplier_terminal.gd" id="1_terminal"]
 [ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
-[ext_resource type="PackedScene" path="res://items/world_item.tscn" id="3_world_item"]
+[ext_resource type="PackedScene" path="res://items/delivery_box.tscn" id="4_delivery_box"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_terminal"]
 size = Vector3(1.2, 1.5, 0.65)
@@ -28,7 +28,7 @@ corner_radius_bottom_left = 8
 
 [node name="SupplierTerminal" type="StaticBody3D"]
 script = ExtResource("1_terminal")
-world_item_scene = ExtResource("3_world_item")
+delivery_box_scene = ExtResource("4_delivery_box")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_terminal")
@@ -81,22 +81,25 @@ horizontal_alignment = 1
 
 [node name="TerminalMoneyLabel" type="Label" parent="SupplierUI/SupplierMenu/Margin/Content"]
 unique_name_in_owner = true
-text = "Saldo: $100"
+text = "Saldo: $40"
 horizontal_alignment = 1
 
 [node name="Separator" type="HSeparator" parent="SupplierUI/SupplierMenu/Margin/Content"]
 
-[node name="ItemButton1" type="Button" parent="SupplierUI/SupplierMenu/Margin/Content"]
+[node name="DeliveryStatusLabel" type="Label" parent="SupplierUI/SupplierMenu/Margin/Content"]
 unique_name_in_owner = true
-text = "Item 1"
+text = "Entregas: nenhuma pendente"
+horizontal_alignment = 1
 
-[node name="ItemButton2" type="Button" parent="SupplierUI/SupplierMenu/Margin/Content"]
-unique_name_in_owner = true
-text = "Item 2"
+[node name="CatalogScroll" type="ScrollContainer" parent="SupplierUI/SupplierMenu/Margin/Content"]
+custom_minimum_size = Vector2(0, 210)
+horizontal_scroll_mode = 0
 
-[node name="ItemButton3" type="Button" parent="SupplierUI/SupplierMenu/Margin/Content"]
+[node name="CatalogButtons" type="VBoxContainer" parent="SupplierUI/SupplierMenu/Margin/Content/CatalogScroll"]
 unique_name_in_owner = true
-text = "Item 3"
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
 
 [node name="FeedbackLabel" type="Label" parent="SupplierUI/SupplierMenu/Margin/Content"]
 unique_name_in_owner = true

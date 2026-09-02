@@ -1,4 +1,4 @@
-# Plano da V2 — Farmácia Frenética
+w# Plano da V2 — Farmácia Frenética
 
 ## Visão
 

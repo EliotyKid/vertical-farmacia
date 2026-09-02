@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://items/item_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = &"nimbus_elixir"
+display_name = "Elixir Nimbo"
+category = 2
+sell_price = 58
+tags = Array[StringName]([&"crafted", &"fictional_medicine"])
+placeholder_color = Color(0.48, 0.86, 0.72, 1)

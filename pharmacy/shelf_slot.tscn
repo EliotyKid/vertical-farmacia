@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://pharmacy/shelf_slot.gd" id="1_slot"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+
+[sub_resource type="BoxShape3D" id="SlotShape"]
+size = Vector3(1.05, 0.7, 0.42)
+
+[sub_resource type="BoxMesh" id="SlotMesh"]
+size = Vector3(1.05, 0.7, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="SlotMaterial"]
+transparency = 1
+albedo_color = Color(0.2, 0.85, 0.48, 0.09)
+shading_mode = 0
+
+[node name="ShelfSlot" type="Area3D"]
+collision_layer = 1
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_slot")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SlotShape")
+
+[node name="SlotVisual" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, 0.2)
+mesh = SubResource("SlotMesh")
+material_override = SubResource("SlotMaterial")
+
+[node name="ItemMarker" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 0, 0.24)
+
+[node name="Interactable" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_interactable")
+interaction_text = "Usar espaço"

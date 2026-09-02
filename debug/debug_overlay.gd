@@ -4,6 +4,9 @@ extends CanvasLayer
 @onready var fps_label: Label = %FPSLabel
 @onready var carried_item_label: Label = %CarriedItemLabel
 @onready var target_label: Label = %TargetLabel
+@onready var metrics_label: Label = %MetricsLabel
+
+var _metrics: PlaytestMetrics
 
 func _ready() -> void:
 	panel.visible = false
@@ -13,8 +16,23 @@ func _process(_delta: float) -> void:
 	fps_label.text = "FPS: %d" % Engine.get_frames_per_second()
 	if Input.is_action_just_pressed("debug_toggle"):
 		panel.visible = not panel.visible
+	if OS.is_debug_build() and Input.is_action_just_pressed("debug_reset_progress"):
+		var save_manager := get_tree().get_first_node_in_group("save_manager") as PharmacySaveManager
+		if save_manager != null:
+			save_manager.reset_progress()
+	if OS.is_debug_build() and Input.is_action_just_pressed("debug_add_money"):
+		_debug_add_money()
+	if OS.is_debug_build() and Input.is_action_just_pressed("debug_spawn_customer"):
+		_debug_spawn_customer()
+	if OS.is_debug_build() and Input.is_action_just_pressed("debug_inspection"):
+		_debug_schedule_inspection()
+	if OS.is_debug_build() and Input.is_action_just_pressed("debug_explosion"):
+		_debug_trigger_explosion()
+	if _metrics != null:
+		metrics_label.text = _metrics.get_debug_summary()
 
 func _connect_sources() -> void:
+	_metrics = get_tree().get_first_node_in_group("playtest_metrics") as PlaytestMetrics
 	var player := get_tree().get_first_node_in_group("player") as PharmacyPlayer
 	if player != null:
 		var carry := player.get_node_or_null("CarryController") as CarryController
@@ -30,3 +48,28 @@ func _on_carried_item_changed(item: WorldItem) -> void:
 
 func _on_target_changed(target: Node) -> void:
 	target_label.text = "Alvo: %s" % (target.get_parent().name if target != null else "nenhum")
+
+
+func _debug_add_money() -> void:
+	var player := get_tree().get_first_node_in_group("player") as PharmacyPlayer
+	var wallet := player.get_node_or_null("Wallet") as Wallet if player != null else null
+	if wallet != null:
+		wallet.add_money(100)
+
+
+func _debug_spawn_customer() -> void:
+	var spawner := get_tree().get_first_node_in_group("customer_spawner") as CustomerSpawner
+	if spawner != null:
+		spawner.debug_spawn_customer()
+
+
+func _debug_schedule_inspection() -> void:
+	var manager := get_tree().get_first_node_in_group("inspection_manager") as InspectionManager
+	if manager != null:
+		manager.debug_schedule_inspection()
+
+
+func _debug_trigger_explosion() -> void:
+	var station := get_tree().get_first_node_in_group("crafting_station") as StationInput
+	if station != null:
+		station.debug_trigger_explosion()

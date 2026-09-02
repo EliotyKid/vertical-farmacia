@@ -6,6 +6,8 @@ signal departed(customer: PharmacyCustomer)
 signal order_created(customer: PharmacyCustomer, order: CustomerOrder)
 signal order_completed(customer: PharmacyCustomer, order: CustomerOrder)
 signal delivery_rejected(customer: PharmacyCustomer, delivered_item: ItemData)
+signal order_abandoned(customer: PharmacyCustomer, order: CustomerOrder)
+signal patience_changed(customer: PharmacyCustomer, ratio: float)
 
 enum State {
 	ENTERING,
@@ -15,16 +17,22 @@ enum State {
 	RECEIVING,
 	LEAVING,
 	FAILED,
+	COMPLAINING,
 }
+
+enum Archetype { COMMON, RUSHED, SPECIAL }
 
 @export_range(0.5, 6.0, 0.1) var move_speed: float = 2.2
 @export_range(0.05, 1.0, 0.05) var arrival_distance: float = 0.2
 @export var requested_item: ItemData
 @export_range(0, 10000, 1) var order_reward: int = 20
+@export_range(5.0, 180.0, 1.0) var patience_duration: float = 45.0
 
 @onready var state_label: Label3D = %StateLabel
 @onready var body_mesh: MeshInstance3D = %BodyMesh
 @onready var head_mesh: MeshInstance3D = %HeadMesh
+@onready var patience_bar: MeshInstance3D = %PatienceBar
+@onready var patience_text: Label3D = %PatienceText
 
 var current_state: State = State.ENTERING
 var counter_position: Vector3
@@ -33,17 +41,37 @@ var _wait_remaining: float = 0.0
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var current_order: CustomerOrder
 var _walk_feedback_time: float = 0.0
+var _patience_remaining: float
+var archetype: Archetype = Archetype.COMMON
+var archetype_label: String = "COMUM"
 
 
 func setup(counter_target: Vector3, exit_target: Vector3) -> void:
 	counter_position = counter_target
 	exit_position = exit_target
+	_patience_remaining = patience_duration
+
+
+func update_queue_position(target: Vector3) -> void:
+	counter_position = target
 
 
 func configure_order(item: ItemData) -> void:
 	requested_item = item
 	if requested_item != null:
 		order_reward = requested_item.sell_price
+
+
+func configure_archetype(new_archetype: Archetype, configured_patience: float) -> void:
+	archetype = new_archetype
+	patience_duration = maxf(configured_patience, 5.0)
+	match archetype:
+		Archetype.RUSHED:
+			archetype_label = "APRESSADO"
+		Archetype.SPECIAL:
+			archetype_label = "ESPECIAL"
+		_:
+			archetype_label = "COMUM"
 
 
 func _ready() -> void:
@@ -71,7 +99,11 @@ func _physics_process(delta: float) -> void:
 			if _wait_remaining <= 0.0:
 				_create_order()
 		State.ORDER_ACTIVE:
-			_stop_horizontal_movement()
+			_update_patience(delta)
+			if _horizontal_distance_to(counter_position) > arrival_distance:
+				_move_toward(counter_position)
+			else:
+				_stop_horizontal_movement()
 		State.LEAVING:
 			_move_toward(exit_position)
 			if _horizontal_distance_to(exit_position) <= arrival_distance:
@@ -86,6 +118,10 @@ func _physics_process(delta: float) -> void:
 
 func get_state_name() -> String:
 	return State.keys()[current_state].capitalize()
+
+
+func get_order_wait_time() -> float:
+	return clampf(patience_duration - _patience_remaining, 0.0, patience_duration)
 
 
 func can_player_interact(_player: PharmacyPlayer) -> bool:
@@ -114,6 +150,50 @@ func _create_order() -> void:
 	current_order.reward = order_reward
 	_change_state(State.ORDER_ACTIVE)
 	order_created.emit(self, current_order)
+	_update_patience_visual()
+
+
+func _update_patience(delta: float) -> void:
+	_patience_remaining = maxf(_patience_remaining - delta, 0.0)
+	_update_patience_visual()
+	if _patience_remaining <= 0.0:
+		_abandon_order()
+
+
+func _update_patience_visual() -> void:
+	var ratio := clampf(_patience_remaining / patience_duration, 0.0, 1.0)
+	patience_bar.visible = current_state == State.ORDER_ACTIVE
+	patience_text.visible = current_state == State.ORDER_ACTIVE
+	patience_bar.scale.x = maxf(ratio, 0.01)
+	patience_bar.position.x = -0.45 * (1.0 - ratio)
+	var urgency := "URGENTE!" if ratio <= 0.25 else ("ATENÇÃO" if ratio <= 0.5 else "")
+	patience_text.text = "%s  %ds" % [urgency, ceili(_patience_remaining)]
+	patience_text.modulate = Color("ff6969") if ratio <= 0.25 else (Color("ffd36a") if ratio <= 0.5 else Color.WHITE)
+	var material := patience_bar.material_override as StandardMaterial3D
+	if material != null:
+		material.albedo_color = Color("67df83").lerp(Color("ef4f4f"), 1.0 - ratio)
+		material.emission = material.albedo_color
+	patience_changed.emit(self, ratio)
+
+
+func _abandon_order() -> void:
+	if current_state != State.ORDER_ACTIVE:
+		return
+	var abandoned_order := current_order
+	current_order = null
+	_change_state(State.COMPLAINING)
+	state_label.text = "DEMOROU DEMAIS!"
+	state_label.modulate = Color("ff6969")
+	patience_bar.visible = false
+	patience_text.visible = false
+	order_abandoned.emit(self, abandoned_order)
+	_leave_after_delay(1.1)
+
+
+func _leave_after_delay(delay: float) -> void:
+	await get_tree().create_timer(delay).timeout
+	state_label.modulate = Color.WHITE
+	_change_state(State.LEAVING)
 
 
 func _on_interacted(player: PharmacyPlayer) -> void:
@@ -184,17 +264,20 @@ func _change_state(new_state: State) -> void:
 
 func _update_state_label() -> void:
 	if current_state == State.ORDER_ACTIVE and current_order != null:
-		state_label.text = "PEDIDO\n%s" % current_order.requested_item.display_name
+		state_label.text = "%s • PEDIDO\n%s" % [archetype_label, current_order.requested_item.display_name]
 	else:
 		state_label.text = get_state_name()
 
 
 func _apply_customer_visual() -> void:
 	var material := StandardMaterial3D.new()
-	if requested_item != null and requested_item.category == ItemData.Category.CRAFTED_PRODUCT:
-		material.albedo_color = Color("9258b8")
-	else:
-		material.albedo_color = Color("db783d")
+	match archetype:
+		Archetype.RUSHED:
+			material.albedo_color = Color("d9503f")
+		Archetype.SPECIAL:
+			material.albedo_color = Color("9258b8")
+		_:
+			material.albedo_color = Color("db9b3d")
 	material.roughness = 0.82
 	body_mesh.material_override = material
 	head_mesh.material_override = material

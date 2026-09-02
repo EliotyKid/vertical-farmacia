@@ -10,8 +10,8 @@ script = ExtResource("1_debug")
 unique_name_in_owner = true
 offset_left = 16.0
 offset_top = 16.0
-offset_right = 290.0
-offset_bottom = 124.0
+offset_right = 330.0
+offset_bottom = 355.0
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 theme_override_constants/margin_left = 12
@@ -22,7 +22,15 @@ theme_override_constants/margin_bottom = 8
 [node name="Labels" type="VBoxContainer" parent="Panel/Margin"]
 
 [node name="Title" type="Label" parent="Panel/Margin/Labels"]
-text = "V2.0 • DEBUG"
+text = "DEBUG • F3 abre/fecha"
+
+[node name="ResetHint" type="Label" parent="Panel/Margin/Labels"]
+theme_override_colors/font_color = Color(1, 0.72, 0.35, 1)
+text = "F4: resetar progressão"
+
+[node name="CheatHint" type="Label" parent="Panel/Margin/Labels"]
+theme_override_colors/font_color = Color(1, 0.82, 0.5, 1)
+text = "F5: +$100\nF6: gerar cliente\nF7: fiscalização em 5s\nB: forçar explosão"
 
 [node name="FPSLabel" type="Label" parent="Panel/Margin/Labels"]
 unique_name_in_owner = true
@@ -35,3 +43,9 @@ text = "Carregando: nada"
 [node name="TargetLabel" type="Label" parent="Panel/Margin/Labels"]
 unique_name_in_owner = true
 text = "Alvo: nenhum"
+
+[node name="Separator" type="HSeparator" parent="Panel/Margin/Labels"]
+
+[node name="MetricsLabel" type="Label" parent="Panel/Margin/Labels"]
+unique_name_in_owner = true
+text = "Métricas aguardando..."

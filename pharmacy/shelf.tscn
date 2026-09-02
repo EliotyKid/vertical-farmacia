@@ -1,7 +1,11 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://d2bff8m7ye8ur"]
 
-[ext_resource type="Script" path="res://pharmacy/shelf.gd" id="1_shelf"]
-[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="Script" uid="uid://ca0uwx7u5e5v8" path="res://pharmacy/shelf.gd" id="1_shelf"]
+[ext_resource type="PackedScene" path="res://pharmacy/shelf_slot.tscn" id="2_slot"]
+
+[sub_resource type="StandardMaterial3D" id="Material_shelf"]
+albedo_color = Color(0.42, 0.5, 0.57, 1)
+roughness = 0.85
 
 [sub_resource type="BoxMesh" id="BoxMesh_back"]
 size = Vector3(2.5, 2.5, 0.3)
@@ -9,88 +13,60 @@ size = Vector3(2.5, 2.5, 0.3)
 [sub_resource type="BoxMesh" id="BoxMesh_tier"]
 size = Vector3(2.5, 0.12, 0.8)
 
-[sub_resource type="StandardMaterial3D" id="Material_shelf"]
-albedo_color = Color(0.42, 0.5, 0.57, 1)
-roughness = 0.85
-
 [sub_resource type="BoxShape3D" id="BoxShape_shelf"]
 size = Vector3(2.5, 2.5, 0.8)
 
-[sub_resource type="BoxShape3D" id="BoxShape_interaction"]
-size = Vector3(2.7, 2.7, 1.35)
-
-[sub_resource type="StandardMaterial3D" id="Material_slot"]
-transparency = 1
-albedo_color = Color(0.25, 0.85, 0.48, 0.32)
-shading_mode = 0
-
-[node name="Shelf" type="StaticBody3D"]
+[node name="Shelf" type="StaticBody3D" unique_id=583291071]
 script = ExtResource("1_shelf")
 
-[node name="Back" type="MeshInstance3D" parent="."]
+[node name="Back" type="MeshInstance3D" parent="." unique_id=434514757]
+material_override = SubResource("Material_shelf")
 mesh = SubResource("BoxMesh_back")
-material_override = SubResource("Material_shelf")
 
-[node name="Tier1" type="MeshInstance3D" parent="."]
-position = Vector3(0, -1, 0.35)
+[node name="Tier1" type="MeshInstance3D" parent="." unique_id=1233654882]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0.35)
+material_override = SubResource("Material_shelf")
 mesh = SubResource("BoxMesh_tier")
-material_override = SubResource("Material_shelf")
 
-[node name="Tier2" type="MeshInstance3D" parent="."]
-position = Vector3(0, 0, 0.35)
+[node name="Tier2" type="MeshInstance3D" parent="." unique_id=995498457]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.35)
+material_override = SubResource("Material_shelf")
 mesh = SubResource("BoxMesh_tier")
-material_override = SubResource("Material_shelf")
 
-[node name="Tier3" type="MeshInstance3D" parent="."]
-position = Vector3(0, 1, 0.35)
+[node name="Tier3" type="MeshInstance3D" parent="." unique_id=167059614]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0.35)
+material_override = SubResource("Material_shelf")
 mesh = SubResource("BoxMesh_tier")
-material_override = SubResource("Material_shelf")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1913527043]
 shape = SubResource("BoxShape_shelf")
 
-[node name="InteractionArea" type="Area3D" parent="."]
-collision_layer = 1
-collision_mask = 0
-monitoring = false
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
-position = Vector3(0, 0, 0.22)
-shape = SubResource("BoxShape_interaction")
-
-[node name="Slots" type="Node3D" parent="."]
-
-[node name="Slot1" type="Marker3D" parent="Slots"]
+[node name="Slots" type="Node3D" parent="." unique_id=1192626230]
 unique_name_in_owner = true
-position = Vector3(-0.62, -0.72, 0.56)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.50822484)
 
-[node name="Slot2" type="Marker3D" parent="Slots"]
-unique_name_in_owner = true
-position = Vector3(0.62, -0.72, 0.56)
+[node name="Slot1" parent="Slots" unique_id=408615498 instance=ExtResource("2_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, -0.72, 0.76)
 
-[node name="Slot3" type="Marker3D" parent="Slots"]
-unique_name_in_owner = true
-position = Vector3(-0.62, 0.28, 0.56)
+[node name="Slot2" parent="Slots" unique_id=400286865 instance=ExtResource("2_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, -0.72, 0.76)
 
-[node name="Slot4" type="Marker3D" parent="Slots"]
-unique_name_in_owner = true
-position = Vector3(0.62, 0.28, 0.56)
+[node name="Slot3" parent="Slots" unique_id=1671035436 instance=ExtResource("2_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0.28, 0.76)
 
-[node name="Slot5" type="Marker3D" parent="Slots"]
-unique_name_in_owner = true
-position = Vector3(-0.62, 1.28, 0.56)
+[node name="Slot4" parent="Slots" unique_id=175203764 instance=ExtResource("2_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 0.28, 0.76)
 
-[node name="Slot6" type="Marker3D" parent="Slots"]
-unique_name_in_owner = true
-position = Vector3(0.62, 1.28, 0.56)
+[node name="Slot5" parent="Slots" unique_id=1886105787 instance=ExtResource("2_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 1.28, 0.76)
 
-[node name="StatusLabel" type="Label3D" parent="."]
+[node name="Slot6" parent="Slots" unique_id=111059061 instance=ExtResource("2_slot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 1.28, 0.76)
+
+[node name="StatusLabel" type="Label3D" parent="." unique_id=1474022505]
 unique_name_in_owner = true
-position = Vector3(0, 1.65, 0.2)
-text = "0 / 6"
-font_size = 42
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0.2)
+text = "PRATELEIRA
+0 / 6"
+font_size = 36
 outline_size = 8
-
-[node name="Interactable" type="Node" parent="."]
-script = ExtResource("2_interactable")
-interaction_text = "Usar prateleira"

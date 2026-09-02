@@ -13,14 +13,14 @@ var _highlight_material: StandardMaterial3D
 func can_interact(_player: PharmacyPlayer) -> bool:
 	if not enabled:
 		return false
-	var owner_node := get_parent()
+	var owner_node := _get_behavior_owner()
 	if owner_node.has_method("can_player_interact"):
 		return owner_node.can_player_interact(_player)
 	return true
 
 
 func get_interaction_text() -> String:
-	var owner_node := get_parent()
+	var owner_node := _get_behavior_owner()
 	if owner_node.has_method("get_contextual_interaction_text"):
 		return owner_node.get_contextual_interaction_text()
 	return interaction_text
@@ -30,6 +30,14 @@ func interact(player: PharmacyPlayer) -> void:
 	if not can_interact(player):
 		return
 	interacted.emit(player)
+
+
+func _get_behavior_owner() -> Node:
+	var direct_owner := get_parent()
+	if direct_owner.has_method("can_player_interact") or direct_owner.has_method("get_contextual_interaction_text"):
+		return direct_owner
+	var parent_owner := direct_owner.get_parent()
+	return parent_owner if parent_owner != null else direct_owner
 
 
 func set_highlighted(value: bool) -> void:

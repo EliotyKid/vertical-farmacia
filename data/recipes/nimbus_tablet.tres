@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RecipeData" load_steps=5 format=3]
+[ext_resource type="Script" path="res://crafting/recipe_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/items/nimbus_crystal.tres" id="2"]
+[ext_resource type="Resource" path="res://data/items/golden_spore.tres" id="3"]
+[ext_resource type="Resource" path="res://data/items/nimbus_tablet.tres" id="4"]
+[resource]
+script = ExtResource("1")
+id = &"nimbus_tablet"
+display_name = "Pastilha Nimbo"
+required_ingredients = [ExtResource("2"), ExtResource("3")]
+output_item = ExtResource("4")
+craft_time = 2.0
+station_type = 1
