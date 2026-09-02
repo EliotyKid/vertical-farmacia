@@ -31,6 +31,12 @@
 [ext_resource type="PackedScene" path="res://pharmacy/upgrade_terminal.tscn" id="35_upgrades"]
 [ext_resource type="Script" uid="uid://cqk6132b4aeoe" path="res://autoload/save_manager.gd" id="36_save"]
 [ext_resource type="Script" uid="uid://c2axoxfagox7y" path="res://debug/playtest_metrics.gd" id="37_metrics"]
+[ext_resource type="PackedScene" path="res://ui/recipe_book.tscn" id="38_book"]
+[ext_resource type="Resource" path="res://data/recipes/experimental_medicine.tres" id="39_recipe_experimental"]
+[ext_resource type="Resource" path="res://data/recipes/focus_syrup.tres" id="40_recipe_focus"]
+[ext_resource type="Resource" path="res://data/recipes/nimbus_elixir.tres" id="41_recipe_elixir"]
+[ext_resource type="Resource" path="res://data/recipes/lunar_compound.tres" id="42_recipe_lunar"]
+[ext_resource type="Resource" path="res://data/recipes/nimbus_tablet.tres" id="43_recipe_tablet"]
 
 [node name="PharmacyTest" type="Node3D" unique_id=786112716]
 script = ExtResource("1_level")
@@ -81,6 +87,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, -8.3)
 
 [node name="PressSpawn" type="Marker3D" parent="." unique_id=115509831 groups=["upgrade_press_spawn"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, 0.75, -5.5)
+
+[node name="RecipeBook" parent="." instance=ExtResource("38_book")]
+position = Vector3(-4.8, 0.6, -5.5)
+recipes = Array[ExtResource("39_recipe_experimental")]([ExtResource("39_recipe_experimental"), ExtResource("40_recipe_focus"), ExtResource("41_recipe_elixir"), ExtResource("42_recipe_lunar"), ExtResource("43_recipe_tablet")])
 
 [node name="DeliverySpawn" type="Marker3D" parent="." unique_id=1844372214 groups=["delivery_spawn"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2, 0.55, 8)

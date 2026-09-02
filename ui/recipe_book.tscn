@@ -1,0 +1,110 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://ui/recipe_book.gd" id="1_book"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+
+[sub_resource type="BoxMesh" id="PedestalMesh"]
+size = Vector3(1.15, 1.2, 0.75)
+
+[sub_resource type="BoxShape3D" id="PedestalShape"]
+size = Vector3(1.15, 1.2, 0.75)
+
+[sub_resource type="StandardMaterial3D" id="PedestalMaterial"]
+albedo_color = Color(0.22, 0.12, 0.07, 1)
+roughness = 0.82
+
+[sub_resource type="BoxMesh" id="BookMesh"]
+size = Vector3(0.9, 0.12, 0.62)
+
+[sub_resource type="StandardMaterial3D" id="BookMaterial"]
+albedo_color = Color(0.16, 0.42, 0.3, 1)
+emission_enabled = true
+emission = Color(0.025, 0.11, 0.065, 1)
+
+[sub_resource type="StyleBoxFlat" id="BookPanelStyle"]
+bg_color = Color(0.055, 0.045, 0.032, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.45, 0.72, 0.53, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="RecipeBook" type="StaticBody3D"]
+script = ExtResource("1_book")
+
+[node name="Pedestal" type="MeshInstance3D" parent="."]
+mesh = SubResource("PedestalMesh")
+material_override = SubResource("PedestalMaterial")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("PedestalShape")
+
+[node name="BookMesh" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.66, 0)
+rotation_degrees = Vector3(-12, 0, 0)
+mesh = SubResource("BookMesh")
+material_override = SubResource("BookMaterial")
+
+[node name="WorldLabel" type="Label3D" parent="."]
+position = Vector3(0, 1.05, 0)
+text = "LIVRO DE RECEITAS"
+font_size = 25
+outline_size = 7
+billboard = 1
+
+[node name="Interactable" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_interactable")
+interaction_text = "Abrir livro de receitas"
+
+[node name="RecipeBookUI" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="RecipeBookMenu" type="PanelContainer" parent="RecipeBookUI"]
+unique_name_in_owner = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -300.0
+offset_right = 350.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("BookPanelStyle")
+
+[node name="Margin" type="MarginContainer" parent="RecipeBookUI/RecipeBookMenu"]
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
+
+[node name="Content" type="VBoxContainer" parent="RecipeBookUI/RecipeBookMenu/Margin"]
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="RecipeBookUI/RecipeBookMenu/Margin/Content"]
+theme_override_colors/font_color = Color(0.75, 0.94, 0.8, 1)
+theme_override_font_sizes/font_size = 30
+text = "Livro de Receitas Fictícias"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="RecipeBookUI/RecipeBookMenu/Margin/Content"]
+text = "Consulte ingredientes e instruções de operação"
+horizontal_alignment = 1
+
+[node name="RecipeText" type="RichTextLabel" parent="RecipeBookUI/RecipeBookMenu/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 445)
+bbcode_enabled = true
+scroll_active = true
+fit_content = false
+
+[node name="CloseButton" type="Button" parent="RecipeBookUI/RecipeBookMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Fechar"

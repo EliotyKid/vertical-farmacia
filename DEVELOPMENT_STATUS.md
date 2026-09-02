@@ -319,6 +319,15 @@ Em 2026-09-02, uma inicialização isolada da cena principal verificou 11 requis
 
 Resultado automatizado: `V2_AUDIT checks=11 failures=[]`.
 
+## Livro de receitas
+
+- um livro físico foi adicionado dentro do laboratório;
+- a interação abre uma interface rolável e bloqueia os controles do jogador enquanto está aberta;
+- as quatro receitas da caldeira e a receita da prensa são lidas diretamente dos `RecipeData`;
+- cada entrada mostra ingredientes fictícios, produto resultante e estação utilizada;
+- o livro explica os comandos `Q/R` da caldeira e as quatro interações `E` da prensa;
+- `Esc` ou o botão `Fechar` devolvem o controle ao jogador.
+
 ## Limitação conhecida não bloqueante
 
 O deslocamento físico do knockback da explosão já apresentou baixa percepção em um teste anterior. A explosão agora possui tremor de câmera, flash e som, portanto o impacto é legível, mas a intensidade do deslocamento pode ser recalibrada em uma rodada futura de playtest.
