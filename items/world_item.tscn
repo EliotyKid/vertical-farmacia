@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://items/world_item.gd" id="1_item"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_item"]
+size = Vector3(0.48, 0.36, 0.28)
+
+[sub_resource type="BoxShape3D" id="BoxShape_item"]
+size = Vector3(0.48, 0.36, 0.28)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_item"]
+friction = 0.8
+bounce = 0.05
+
+[node name="WorldItem" type="RigidBody3D"]
+mass = 0.25
+physics_material_override = SubResource("PhysicsMaterial_item")
+continuous_cd = true
+script = ExtResource("1_item")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+mesh = SubResource("BoxMesh_item")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_item")
+
+[node name="NameLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 0.38, 0)
+font_size = 28
+outline_size = 7
+billboard = 1
+no_depth_test = true
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+interaction_text = "Pegar item"

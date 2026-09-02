@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="RecipeData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://crafting/recipe_data.gd" id="1_recipe"]
+[ext_resource type="Resource" path="res://data/items/red_ingredient.tres" id="2_red"]
+[ext_resource type="Resource" path="res://data/items/blue_ingredient.tres" id="3_blue"]
+[ext_resource type="Resource" path="res://data/items/experimental_medicine.tres" id="4_output"]
+
+[resource]
+script = ExtResource("1_recipe")
+id = &"experimental_medicine"
+display_name = "Remédio Experimental"
+required_ingredients = [ExtResource("2_red"), ExtResource("3_blue")]
+output_item = ExtResource("4_output")
+craft_time = 3.0
+failure_chance = 0.0
+station_type = 0

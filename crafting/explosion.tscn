@@ -1,0 +1,51 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://crafting/explosion.gd" id="1_explosion"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_blast"]
+radius = 0.75
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="Material_blast"]
+transparency = 1
+albedo_color = Color(1, 0.16, 0.03, 0.72)
+emission_enabled = true
+emission = Color(1, 0.08, 0.01, 1)
+emission_energy_multiplier = 5.0
+shading_mode = 0
+
+[sub_resource type="SphereShape3D" id="SphereShape_blast"]
+radius = 6.0
+
+[sub_resource type="StandardMaterial3D" id="Material_smoke"]
+transparency = 1
+albedo_color = Color(0.12, 0.1, 0.13, 0.55)
+shading_mode = 0
+
+[node name="Explosion" type="Node3D"]
+script = ExtResource("1_explosion")
+
+[node name="BlastMesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_blast")
+material_override = SubResource("Material_blast")
+
+[node name="SmokeMesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+scale = Vector3(1.3, 1.3, 1.3)
+mesh = SubResource("SphereMesh_blast")
+material_override = SubResource("Material_smoke")
+
+[node name="BlastLight" type="OmniLight3D" parent="."]
+unique_name_in_owner = true
+light_color = Color(1, 0.18, 0.03, 1)
+light_energy = 12.0
+omni_range = 7.0
+
+[node name="BlastArea" type="Area3D" parent="."]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BlastArea"]
+shape = SubResource("SphereShape_blast")

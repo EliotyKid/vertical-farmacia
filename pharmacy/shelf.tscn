@@ -1,0 +1,96 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://pharmacy/shelf.gd" id="1_shelf"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_back"]
+size = Vector3(2.5, 2.5, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tier"]
+size = Vector3(2.5, 0.12, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="Material_shelf"]
+albedo_color = Color(0.42, 0.5, 0.57, 1)
+roughness = 0.85
+
+[sub_resource type="BoxShape3D" id="BoxShape_shelf"]
+size = Vector3(2.5, 2.5, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape_interaction"]
+size = Vector3(2.7, 2.7, 1.35)
+
+[sub_resource type="StandardMaterial3D" id="Material_slot"]
+transparency = 1
+albedo_color = Color(0.25, 0.85, 0.48, 0.32)
+shading_mode = 0
+
+[node name="Shelf" type="StaticBody3D"]
+script = ExtResource("1_shelf")
+
+[node name="Back" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_back")
+material_override = SubResource("Material_shelf")
+
+[node name="Tier1" type="MeshInstance3D" parent="."]
+position = Vector3(0, -1, 0.35)
+mesh = SubResource("BoxMesh_tier")
+material_override = SubResource("Material_shelf")
+
+[node name="Tier2" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, 0.35)
+mesh = SubResource("BoxMesh_tier")
+material_override = SubResource("Material_shelf")
+
+[node name="Tier3" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1, 0.35)
+mesh = SubResource("BoxMesh_tier")
+material_override = SubResource("Material_shelf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_shelf")
+
+[node name="InteractionArea" type="Area3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
+position = Vector3(0, 0, 0.22)
+shape = SubResource("BoxShape_interaction")
+
+[node name="Slots" type="Node3D" parent="."]
+
+[node name="Slot1" type="Marker3D" parent="Slots"]
+unique_name_in_owner = true
+position = Vector3(-0.62, -0.72, 0.56)
+
+[node name="Slot2" type="Marker3D" parent="Slots"]
+unique_name_in_owner = true
+position = Vector3(0.62, -0.72, 0.56)
+
+[node name="Slot3" type="Marker3D" parent="Slots"]
+unique_name_in_owner = true
+position = Vector3(-0.62, 0.28, 0.56)
+
+[node name="Slot4" type="Marker3D" parent="Slots"]
+unique_name_in_owner = true
+position = Vector3(0.62, 0.28, 0.56)
+
+[node name="Slot5" type="Marker3D" parent="Slots"]
+unique_name_in_owner = true
+position = Vector3(-0.62, 1.28, 0.56)
+
+[node name="Slot6" type="Marker3D" parent="Slots"]
+unique_name_in_owner = true
+position = Vector3(0.62, 1.28, 0.56)
+
+[node name="StatusLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.65, 0.2)
+text = "0 / 6"
+font_size = 42
+outline_size = 8
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+interaction_text = "Usar prateleira"

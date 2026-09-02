@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://interaction/test_button.gd" id="1_button"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_button"]
+size = Vector3(0.8, 0.8, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="Material_button"]
+albedo_color = Color(0.764706, 0.309804, 0.309804, 1)
+roughness = 0.8
+
+[sub_resource type="BoxShape3D" id="BoxShape_button"]
+size = Vector3(0.8, 0.8, 0.35)
+
+[node name="TestButton" type="StaticBody3D"]
+script = ExtResource("1_button")
+
+[node name="ButtonMesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+mesh = SubResource("BoxMesh_button")
+material_override = SubResource("Material_button")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_button")
+
+[node name="StatusLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 0, 0.19)
+text = "OFF"
+font_size = 48
+outline_size = 8
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+interaction_text = "Alternar botão"

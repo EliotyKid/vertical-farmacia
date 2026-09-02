@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://interaction/test_dummy.gd" id="1_dummy"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dummy"]
+top_radius = 0.55
+bottom_radius = 0.55
+height = 1.5
+
+[sub_resource type="CylinderShape3D" id="CylinderShape_dummy"]
+radius = 0.55
+height = 1.5
+
+[node name="TestDummy" type="StaticBody3D"]
+script = ExtResource("1_dummy")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_dummy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape_dummy")
+
+[node name="Label" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.15, 0)
+text = "Objeto de teste"
+font_size = 40
+outline_size = 8
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+interaction_text = "Testar objeto"

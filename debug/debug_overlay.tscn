@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://debug/debug_overlay.gd" id="1_debug"]
+
+[node name="DebugOverlay" type="CanvasLayer"]
+layer = 2
+script = ExtResource("1_debug")
+
+[node name="Panel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 290.0
+offset_bottom = 124.0
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Labels" type="VBoxContainer" parent="Panel/Margin"]
+
+[node name="Title" type="Label" parent="Panel/Margin/Labels"]
+text = "V2.0 • DEBUG"
+
+[node name="FPSLabel" type="Label" parent="Panel/Margin/Labels"]
+unique_name_in_owner = true
+text = "FPS: 0"
+
+[node name="CarriedItemLabel" type="Label" parent="Panel/Margin/Labels"]
+unique_name_in_owner = true
+text = "Carregando: nada"
+
+[node name="TargetLabel" type="Label" parent="Panel/Margin/Labels"]
+unique_name_in_owner = true
+text = "Alvo: nenhum"

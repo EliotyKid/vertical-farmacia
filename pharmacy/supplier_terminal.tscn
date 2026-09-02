@@ -1,0 +1,112 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://pharmacy/supplier_terminal.gd" id="1_terminal"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="PackedScene" path="res://items/world_item.tscn" id="3_world_item"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_terminal"]
+size = Vector3(1.2, 1.5, 0.65)
+
+[sub_resource type="StandardMaterial3D" id="Material_terminal"]
+albedo_color = Color(0.16, 0.24, 0.3, 1)
+roughness = 0.72
+
+[sub_resource type="BoxShape3D" id="BoxShape_terminal"]
+size = Vector3(1.2, 1.5, 0.65)
+
+[sub_resource type="StyleBoxFlat" id="Panel_terminal"]
+bg_color = Color(0.055, 0.075, 0.09, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.62, 0.58, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="SupplierTerminal" type="StaticBody3D"]
+script = ExtResource("1_terminal")
+world_item_scene = ExtResource("3_world_item")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_terminal")
+material_override = SubResource("Material_terminal")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape_terminal")
+
+[node name="WorldLabel" type="Label3D" parent="."]
+position = Vector3(0, 0.15, 0.34)
+text = "FORNECEDOR"
+font_size = 36
+outline_size = 8
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+interaction_text = "Abrir fornecedor"
+
+[node name="SupplierUI" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="SupplierMenu" type="PanelContainer" parent="SupplierUI"]
+unique_name_in_owner = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -190.0
+offset_right = 220.0
+offset_bottom = 190.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel_terminal")
+
+[node name="Margin" type="MarginContainer" parent="SupplierUI/SupplierMenu"]
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="Content" type="VBoxContainer" parent="SupplierUI/SupplierMenu/Margin"]
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="SupplierUI/SupplierMenu/Margin/Content"]
+theme_override_font_sizes/font_size = 25
+text = "Terminal do Fornecedor"
+horizontal_alignment = 1
+
+[node name="TerminalMoneyLabel" type="Label" parent="SupplierUI/SupplierMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Saldo: $100"
+horizontal_alignment = 1
+
+[node name="Separator" type="HSeparator" parent="SupplierUI/SupplierMenu/Margin/Content"]
+
+[node name="ItemButton1" type="Button" parent="SupplierUI/SupplierMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Item 1"
+
+[node name="ItemButton2" type="Button" parent="SupplierUI/SupplierMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Item 2"
+
+[node name="ItemButton3" type="Button" parent="SupplierUI/SupplierMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Item 3"
+
+[node name="FeedbackLabel" type="Label" parent="SupplierUI/SupplierMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Selecione uma mercadoria."
+horizontal_alignment = 1
+
+[node name="EmergencyButton" type="Button" parent="SupplierUI/SupplierMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Auxílio emergencial: +$12"
+
+[node name="CloseButton" type="Button" parent="SupplierUI/SupplierMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Fechar"

@@ -1,0 +1,101 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://crafting/station_input.gd" id="1_station"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="PackedScene" path="res://items/world_item.tscn" id="3_world_item"]
+[ext_resource type="Resource" path="res://data/recipes/experimental_medicine.tres" id="4_recipe"]
+[ext_resource type="PackedScene" path="res://crafting/explosion.tscn" id="5_explosion"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cauldron"]
+top_radius = 0.82
+bottom_radius = 0.68
+height = 1.15
+
+[sub_resource type="StandardMaterial3D" id="Material_cauldron"]
+albedo_color = Color(0.29, 0.2, 0.35, 1)
+metallic = 0.35
+roughness = 0.7
+
+[sub_resource type="CylinderShape3D" id="CylinderShape_cauldron"]
+radius = 0.82
+height = 1.15
+
+[sub_resource type="SphereMesh" id="SphereMesh_slot"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Material_slot"]
+albedo_color = Color(0.32, 0.95, 0.67, 1)
+emission_enabled = true
+emission = Color(0.1, 0.5, 0.25, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_progress"]
+size = Vector3(1.3, 0.08, 0.05)
+
+[sub_resource type="StandardMaterial3D" id="Material_progress"]
+albedo_color = Color(0.33, 0.91, 0.61, 1)
+emission_enabled = true
+emission = Color(0.33, 0.91, 0.61, 1)
+emission_energy_multiplier = 1.5
+
+[node name="StationInput" type="StaticBody3D"]
+script = ExtResource("1_station")
+recipes = [ExtResource("4_recipe")]
+world_item_scene = ExtResource("3_world_item")
+explosion_scene = ExtResource("5_explosion")
+
+[node name="CauldronMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_cauldron")
+material_override = SubResource("Material_cauldron")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape_cauldron")
+
+[node name="InputSlots" type="Node3D" parent="."]
+
+[node name="InputSlot1" type="Marker3D" parent="InputSlots"]
+unique_name_in_owner = true
+position = Vector3(-0.38, 0.82, 0)
+
+[node name="Marker" type="MeshInstance3D" parent="InputSlots/InputSlot1"]
+mesh = SubResource("SphereMesh_slot")
+material_override = SubResource("Material_slot")
+
+[node name="InputSlot2" type="Marker3D" parent="InputSlots"]
+unique_name_in_owner = true
+position = Vector3(0, 0.82, 0)
+
+[node name="Marker" type="MeshInstance3D" parent="InputSlots/InputSlot2"]
+mesh = SubResource("SphereMesh_slot")
+material_override = SubResource("Material_slot")
+
+[node name="InputSlot3" type="Marker3D" parent="InputSlots"]
+unique_name_in_owner = true
+position = Vector3(0.38, 0.82, 0)
+
+[node name="Marker" type="MeshInstance3D" parent="InputSlots/InputSlot3"]
+mesh = SubResource("SphereMesh_slot")
+material_override = SubResource("Material_slot")
+
+[node name="StatusLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.55, 0)
+text = "CALDEIRA 0/3"
+font_size = 32
+outline_size = 8
+billboard = 1
+no_depth_test = true
+
+[node name="ProgressMesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.28, 0)
+mesh = SubResource("BoxMesh_progress")
+material_override = SubResource("Material_progress")
+
+[node name="OutputMarker" type="Marker3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 0.45, 1.35)
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+interaction_text = "Usar entrada da caldeira"

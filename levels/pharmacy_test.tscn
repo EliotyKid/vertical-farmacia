@@ -1,0 +1,68 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://levels/pharmacy_test.gd" id="1_level"]
+[ext_resource type="PackedScene" path="res://debug/debug_overlay.tscn" id="2_debug"]
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="3_player"]
+[ext_resource type="Resource" path="res://data/items/basic_medicine.tres" id="8_medicine"]
+[ext_resource type="Resource" path="res://data/items/red_ingredient.tres" id="9_red"]
+[ext_resource type="Resource" path="res://data/items/blue_ingredient.tres" id="10_blue"]
+[ext_resource type="PackedScene" path="res://pharmacy/shelf.tscn" id="11_shelf"]
+[ext_resource type="PackedScene" path="res://pharmacy/supplier_terminal.tscn" id="12_terminal"]
+[ext_resource type="PackedScene" path="res://customers/customer.tscn" id="13_customer"]
+[ext_resource type="Script" path="res://customers/customer_spawner.gd" id="14_spawner"]
+[ext_resource type="PackedScene" path="res://crafting/station_input.tscn" id="15_station_input"]
+[ext_resource type="Resource" path="res://data/items/experimental_medicine.tres" id="16_experimental"]
+[ext_resource type="Script" path="res://feedback/feedback_audio.gd" id="18_feedback_audio"]
+[ext_resource type="Script" path="res://autoload/game_progression.gd" id="19_progression"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="20_hud"]
+
+[node name="PharmacyTest" type="Node3D"]
+script = ExtResource("1_level")
+
+[node name="GameProgression" type="Node" parent="."]
+script = ExtResource("19_progression")
+
+[node name="FeedbackAudio" type="Node" parent="."]
+script = ExtResource("18_feedback_audio")
+
+[node name="DebugOverlay" parent="." instance=ExtResource("2_debug")]
+
+[node name="HUD" parent="." instance=ExtResource("20_hud")]
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector3(0, 1, 8)
+
+[node name="Shelves" type="Node3D" parent="."]
+
+[node name="ShelfLeft" parent="Shelves" instance=ExtResource("11_shelf")]
+position = Vector3(-5.7, 1.25, 5.5)
+
+[node name="ShelfRight" parent="Shelves" instance=ExtResource("11_shelf")]
+position = Vector3(5.7, 1.25, 5.5)
+
+[node name="IngredientStorage" parent="Shelves" instance=ExtResource("11_shelf")]
+position = Vector3(5.8, 1.25, -7.8)
+accepts_categories = [1]
+storage_name = "armazenamento de ingredientes"
+
+[node name="DeliverySpawn" type="Marker3D" parent="." groups=["delivery_spawn"]]
+position = Vector3(-6.2, 0.55, 8)
+
+[node name="SupplierTerminal" parent="." instance=ExtResource("12_terminal")]
+position = Vector3(3.2, 0.75, 2.85)
+catalog = [ExtResource("8_medicine"), ExtResource("9_red"), ExtResource("10_blue")]
+
+[node name="CustomerCounterTarget" type="Marker3D" parent="." groups=["customer_counter_target"]]
+position = Vector3(0, 0.9, 3.45)
+
+[node name="CustomerExit" type="Marker3D" parent="." groups=["customer_exit"]]
+position = Vector3(0, 0.9, 9.2)
+
+[node name="CustomerSpawner" type="Node3D" parent="."]
+position = Vector3(0, 0.9, 9.2)
+script = ExtResource("14_spawner")
+customer_scene = ExtResource("13_customer")
+order_sequence = [ExtResource("8_medicine"), ExtResource("16_experimental")]
+
+[node name="CauldronInput" parent="." instance=ExtResource("15_station_input")]
+position = Vector3(0, 0.58, -5.5)

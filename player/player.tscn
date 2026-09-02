@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://player/interaction_controller.gd" id="2_interaction"]
+[ext_resource type="Script" path="res://player/carry_controller.gd" id="3_carry"]
+[ext_resource type="Script" path="res://economy/wallet.gd" id="4_wallet"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
+radius = 0.35
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
+radius = 0.35
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="PlayerMaterial"]
+albedo_color = Color(0.18, 0.35, 0.52, 1)
+roughness = 0.85
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape_player")
+
+[node name="BodyMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_player")
+material_override = SubResource("PlayerMaterial")
+cast_shadow = 1
+
+[node name="Head" type="Node3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 0.65, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+unique_name_in_owner = true
+current = true
+near = 0.05
+fov = 75.0
+
+[node name="InteractionRay" type="RayCast3D" parent="Head/Camera3D"]
+unique_name_in_owner = true
+target_position = Vector3(0, 0, -3)
+collision_mask = 3
+collide_with_areas = true
+
+[node name="HoldMarker" type="Marker3D" parent="Head/Camera3D"]
+unique_name_in_owner = true
+position = Vector3(0.42, -0.32, -1.15)
+
+[node name="InteractionController" type="Node" parent="." node_paths=PackedStringArray("raycast")]
+script = ExtResource("2_interaction")
+raycast = NodePath("../Head/Camera3D/InteractionRay")
+
+[node name="CarryController" type="Node" parent="." node_paths=PackedStringArray("hold_marker")]
+script = ExtResource("3_carry")
+hold_marker = NodePath("../Head/Camera3D/HoldMarker")
+
+[node name="Wallet" type="Node" parent="."]
+script = ExtResource("4_wallet")

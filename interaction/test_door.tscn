@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://interaction/test_door.gd" id="1_door"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="2_interactable"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_door"]
+size = Vector3(2.4, 3.2, 0.18)
+
+[sub_resource type="StandardMaterial3D" id="Material_door"]
+albedo_color = Color(0.301961, 0.47451, 0.439216, 1)
+roughness = 0.82
+
+[sub_resource type="BoxShape3D" id="BoxShape_door"]
+size = Vector3(2.4, 3.2, 0.18)
+
+[node name="TestDoor" type="Node3D"]
+script = ExtResource("1_door")
+
+[node name="DoorBody" type="StaticBody3D" parent="."]
+position = Vector3(1.2, 1.6, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DoorBody"]
+mesh = SubResource("BoxMesh_door")
+material_override = SubResource("Material_door")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DoorBody"]
+shape = SubResource("BoxShape_door")
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+interaction_text = "Abrir porta"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://items/item_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"blue_ingredient"
+display_name = "Ingrediente Azul"
+category = 1
+buy_price = 8
+sell_price = 4
+tags = Array[StringName]([&"fictional_ingredient"])
+placeholder_color = Color(0.18, 0.36, 0.88, 1)
