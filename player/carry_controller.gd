@@ -20,6 +20,9 @@ func _physics_process(_delta: float) -> void:
 
 
 func try_pick_up(item: WorldItem) -> bool:
+	var network_state := get_node_or_null("/root/NetworkWorldState")
+	if network_state != null and network_state.is_network_active():
+		return network_state.request_pick_up(item, get_parent() as PharmacyPlayer)
 	if current_item != null or item == null or hold_marker == null:
 		return false
 	item.reparent(get_parent().get_parent(), true)
@@ -36,6 +39,10 @@ func try_pick_up(item: WorldItem) -> bool:
 func drop_item() -> WorldItem:
 	if current_item == null:
 		return null
+	var network_state := get_node_or_null("/root/NetworkWorldState")
+	if network_state != null and network_state.is_network_active():
+		network_state.request_drop(get_parent() as PharmacyPlayer)
+		return current_item
 	var dropped_item := current_item
 	current_item = null
 	dropped_item.reparent(get_parent().get_parent(), true)
@@ -62,6 +69,9 @@ func place_current_item(target_parent: Node, target_transform: Transform3D) -> W
 func consume_current_item() -> ItemData:
 	if current_item == null:
 		return null
+	var network_state := get_node_or_null("/root/NetworkWorldState")
+	if network_state != null and network_state.is_network_active() and not network_state.is_host():
+		return null
 	var consumed_data := current_item.item_data
 	var consumed_item := current_item
 	current_item = null
@@ -72,3 +82,15 @@ func consume_current_item() -> ItemData:
 
 func is_carrying_item() -> bool:
 	return current_item != null
+
+func apply_network_item(item: WorldItem) -> void:
+	if current_item == item:
+		return
+	current_item = item
+	carried_item_changed.emit(current_item)
+
+func clear_network_item(item: WorldItem) -> void:
+	if current_item != item:
+		return
+	current_item = null
+	carried_item_changed.emit(null)

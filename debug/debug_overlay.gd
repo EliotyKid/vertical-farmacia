@@ -5,8 +5,13 @@ extends CanvasLayer
 @onready var carried_item_label: Label = %CarriedItemLabel
 @onready var target_label: Label = %TargetLabel
 @onready var metrics_label: Label = %MetricsLabel
+@onready var steam_label: Label = %SteamLabel
+@onready var network_label: Label = %NetworkLabel
 
 var _metrics: PlaytestMetrics
+var _network_session: Node
+var _network_world_state: Node
+var _network_game_state: Node
 
 func _ready() -> void:
 	panel.visible = false
@@ -30,9 +35,23 @@ func _process(_delta: float) -> void:
 		_debug_trigger_explosion()
 	if _metrics != null:
 		metrics_label.text = _metrics.get_debug_summary()
+	if _network_session != null:
+		var world_summary: String = str(_network_world_state.get_debug_summary()) if _network_world_state != null else "mundo indisponível"
+		var game_summary: String = str(_network_game_state.get_debug_summary()) if _network_game_state != null else "jogo indisponível"
+		network_label.text = "%s\n%s\n%s" % [_network_session.get_debug_summary(), world_summary, game_summary]
 
 func _connect_sources() -> void:
 	_metrics = get_tree().get_first_node_in_group("playtest_metrics") as PlaytestMetrics
+	var steam_bootstrap := get_node_or_null("/root/SteamBootstrap")
+	if steam_bootstrap != null:
+		steam_label.text = steam_bootstrap.get_debug_summary()
+		steam_bootstrap.steam_state_changed.connect(_on_steam_state_changed)
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_session != null:
+		_network_session = network_session
+		_network_world_state = get_node_or_null("/root/NetworkWorldState")
+		_network_game_state = get_node_or_null("/root/NetworkGameState")
+		network_session.session_state_changed.connect(_on_network_state_changed.bind(network_session))
 	var player := get_tree().get_first_node_in_group("player") as PharmacyPlayer
 	if player != null:
 		var carry := player.get_node_or_null("CarryController") as CarryController
@@ -48,6 +67,13 @@ func _on_carried_item_changed(item: WorldItem) -> void:
 
 func _on_target_changed(target: Node) -> void:
 	target_label.text = "Alvo: %s" % (target.get_parent().name if target != null else "nenhum")
+
+
+func _on_steam_state_changed(_available: bool, status: String) -> void:
+	steam_label.text = status
+
+func _on_network_state_changed(_status: String, network_session: Node) -> void:
+	network_label.text = network_session.get_debug_summary()
 
 
 func _debug_add_money() -> void:

@@ -66,7 +66,7 @@ func load_game() -> void:
 	_supplier_terminal.restore_emergency_grant_used(bool(data.get("emergency_grant_used", false)))
 
 func save_game() -> void:
-	if _is_loading or _wallet == null or _progression == null or _upgrade_terminal == null:
+	if _is_loading or _wallet == null or _progression == null or _upgrade_terminal == null or _is_network_client():
 		return
 	var data := {
 		"version": SAVE_VERSION,
@@ -99,6 +99,15 @@ func reset_progress() -> void:
 			return
 	get_tree().reload_current_scene()
 
+func restore_local_save_after_network() -> void:
+	_is_loading = true
+	load_game()
+	_is_loading = false
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		save_game()
+
+func _is_network_client() -> bool:
+	var session := get_node_or_null("/root/NetworkSession")
+	return session != null and session._steam_peer != null and not session.is_session_host

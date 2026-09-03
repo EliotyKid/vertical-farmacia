@@ -35,6 +35,10 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	var network_game_state := get_node_or_null("/root/NetworkGameState")
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_game_state != null and network_session != null and network_session._steam_peer != null and not network_session.is_session_host:
+		return
 	for delivery: Dictionary in _pending_deliveries:
 		delivery.remaining = maxf(float(delivery.remaining) - delta, 0.0)
 	_try_complete_deliveries()
@@ -73,14 +77,26 @@ func close_menu() -> void:
 func _request_purchase(catalog_index: int) -> void:
 	if _wallet == null or catalog_index < 0 or catalog_index >= catalog.size():
 		return
+	var network_game_state := get_node_or_null("/root/NetworkGameState")
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_game_state != null and network_session != null and network_session._steam_peer != null:
+		network_game_state.request_purchase(catalog_index)
+		feedback_label.text = "Compra solicitada ao host."
+		return
+	authority_purchase(catalog_index, _wallet)
+
+func authority_purchase(catalog_index: int, wallet: Wallet) -> bool:
+	if wallet == null or catalog_index < 0 or catalog_index >= catalog.size():
+		return false
 	var item_data := catalog[catalog_index]
 	var total_price := item_data.buy_price * purchase_quantity
-	if not _wallet.try_spend(total_price):
+	if not wallet.try_spend(total_price):
 		feedback_label.text = "Dinheiro insuficiente."
-		return
+		return false
 	_queue_delivery(item_data)
 	feedback_label.text = "Pedido confirmado. Chega em %.0fs." % delivery_time
 	item_purchased.emit(item_data, total_price)
+	return true
 
 
 func _queue_delivery(item_data: ItemData) -> void:
@@ -158,6 +174,10 @@ func _on_money_changed(new_amount: int, _difference: int) -> void:
 
 
 func _request_emergency_grant() -> void:
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_session != null and network_session._steam_peer != null and not network_session.is_session_host:
+		feedback_label.text = "Auxílio disponível somente para o host nesta sessão."
+		return
 	var minimum_lot_price := get_cheapest_lot_price()
 	if _wallet == null or _emergency_grant_used or _wallet.money >= minimum_lot_price:
 		return
@@ -186,3 +206,14 @@ func restore_emergency_grant_used(was_used: bool) -> void:
 	_emergency_grant_used = was_used
 	if _wallet != null:
 		_on_money_changed(_wallet.money, 0)
+
+func get_delivery_status() -> String:
+	return _last_delivery_status if not _last_delivery_status.is_empty() else "Entregas: nenhuma pendente"
+
+func apply_network_delivery_status(status: String) -> void:
+	_last_delivery_status = status
+	%DeliveryStatusLabel.text = status
+	delivery_status_changed.emit(status)
+
+func show_network_purchase_result(accepted: bool) -> void:
+	feedback_label.text = "Compra aceita pelo host." if accepted else "Compra recusada pelo host."

@@ -2,6 +2,183 @@
 
 Última atualização: 2026-09-02
 
+O cooperativo online em modo de teste está planejado em `STEAM_COOP_PLAN.md`. A implementação começou pela prova de compatibilidade MP0, preservando a V2 solo funcional.
+
+### Multiplayer — MP0 concluída
+
+- ambiente confirmado em Linux x86_64 com Godot 4.7.1;
+- bundle oficial GodotSteam 4.20.1 / Steamworks SDK 1.64 armazenado localmente em `.tools/` e ignorado pelo Git;
+- editor customizado inicia como Godot 4.7.1;
+- singleton `Steam` e classe `SteamMultiplayerPeer` confirmados em execução headless;
+- Godot do sistema não foi substituído;
+- gameplay e cena principal ainda não receberam código de rede;
+- próximo passo: MP1, inicialização Steam com App ID de teste `480` e fallback solo.
+
+### Multiplayer — MP1 implementada
+
+- App ID de teste `480` configurado somente no ambiente de desenvolvimento;
+- Steam é detectada dinamicamente, preservando execução pelo Godot comum;
+- callbacks, Steam ID e nome do usuário são lidos quando a API inicializa;
+- painel `F3` mostra conexão ou causa do fallback solo.
+
+### Multiplayer — MP2 implementada, aguardando teste com duas contas
+
+- `L` abre o menu cooperativo e bloqueia os controles enquanto ele está aberto;
+- criação de lobby privado/somente para amigos com dois lugares;
+- convite pelo overlay Steam;
+- entrada automática ao aceitar convite;
+- nomes dos membros exibidos no menu;
+- metadata identifica jogo, protocolo, estado e host;
+- lobby com protocolo incompatível é recusado;
+- sair do lobby limpa o estado e retorna ao modo solo;
+- sem Steam, o menu permanece informativo e desativa ações online.
+- se o overlay estiver indisponível, o menu agora informa a causa em vez de falhar silenciosamente;
+- o host pode copiar o ID numérico do lobby e o convidado pode entrar colando esse código, sem depender do overlay;
+- uma build enviada ao segundo jogador precisa usar os templates GodotSteam correspondentes ao sistema operacional dele.
+
+### Multiplayer — MP3 implementada, aguardando teste com duas contas
+
+- `NetworkSession` abre o transporte P2P automaticamente a partir do lobby;
+- o dono usa `host_with_lobby` e o convidado usa `connect_to_lobby` conforme a API GodotSteam 4.20.1 instalada;
+- `multiplayer.multiplayer_peer` recebe o peer Steam sem acoplar a extensão ao modo solo;
+- conexão, desconexão, falha e queda do host possuem estado visível no menu cooperativo e no painel `F3`;
+- um RPC confiável de ida e volta confirma protocolo e identidade entre os processos;
+- sair do lobby fecha o peer e limpa a sessão para permitir novo teste;
+- próximo passo após validar o RPC em duas contas: MP4, dois jogadores na cena.
+
+### Multiplayer — MP3 validada em duas contas
+
+- lobby, transporte Steam P2P e RPC de confirmação funcionaram em dois dispositivos;
+- os dois processos reconheceram a sessão e a identidade do outro peer.
+
+### Multiplayer — MP4 implementada, aguardando teste com duas contas
+
+- jogador local preserva câmera, entrada, HUD, carteira e interação;
+- jogador remoto não processa câmera, entrada, interação ou carregamento;
+- host e convidado aparecem em pontos separados na entrada;
+- cliente envia movimento ao host, que confirma e retransmite o estado;
+- posição, corpo e inclinação da cabeça remotos são interpolados;
+- nome Steam e cor laranja distinguem o parceiro remoto;
+- desconexão remove a representação remota e o modo solo é restaurado;
+- interações, itens e economia ainda não são sincronizados nesta fase.
+
+### Multiplayer — MP4 validada em duas contas
+
+- cada dispositivo controlou somente seu jogador;
+- corpo, nome Steam, movimento e rotação remotos apareceram corretamente.
+
+### Multiplayer — MP5 implementada, aguardando teste com duas contas
+
+- itens recebem IDs únicos atribuídos pelo host;
+- snapshot inicial e criação/remoção dinâmica replicam itens ao convidado;
+- host valida pedidos de pegar, soltar, guardar, retirar e desempacotar;
+- somente um peer pode carregar cada item;
+- itens no chão, na mão e nos slots exatos das prateleiras são sincronizados;
+- caixas compradas pelo host e seu conteúdo desempacotado são replicados;
+- painel `F3` mostra total de itens, carregados e guardados;
+- compras, carteira, clientes e pedidos permanecem fora desta etapa e entram na MP6.
+
+### Multiplayer — MP5 validada em duas contas
+
+- criação, transporte, disputa, descarte, troca e armazenamento de itens permaneceram consistentes;
+- os dois dispositivos observaram o mesmo item e o mesmo slot.
+
+### Multiplayer — MP6 implementada, aguardando teste com duas contas
+
+- saldo, compras e entregas são decididos pelo host e replicados ao convidado;
+- compras solicitadas pelo convidado validam distância, catálogo e saldo no host;
+- somente o host gera e atualiza clientes durante a sessão;
+- cliente recebe réplicas com movimento, fila, pedido, paciência e estado;
+- qualquer jogador pode entregar, mas o host valida o item, consome uma vez e paga uma vez;
+- saldo, status de entrega, pedidos e contadores aparecem nos dois HUDs;
+- o protocolo agora é `farmacia-coop-mp6`.
+
+### Multiplayer — MP6 validada em duas contas
+
+- saldo, compra, entrega, cliente, pedido e pagamento permaneceram iguais nos dois dispositivos;
+- entrega feita por qualquer jogador consumiu e recompensou uma única vez.
+
+### Multiplayer — MP7 implementada, aguardando teste com duas contas
+
+- host controla slots, receitas, timers, estabilidade, resultados e cooldown do laboratório;
+- qualquer jogador pode inserir/retirar ingredientes e enviar comandos Q/R;
+- caldeira e prensa replicam ingredientes, progresso e feedback de operação;
+- sucesso cria um único produto compartilhado;
+- falha cria uma explosão confirmada pelo host nos dois dispositivos;
+- porta do laboratório pode ser acionada por qualquer peer e replica seu movimento;
+- protocolo atualizado para `farmacia-coop-mp7`.
+
+### Multiplayer — MP7 validada em duas contas
+
+- fabricação, comandos cooperativos, resultado, explosão e porta permaneceram sincronizados;
+- o laboratório pôde ser operado em conjunto sem duplicar o produto final.
+
+### Multiplayer — MP8 implementada, aguardando teste com duas contas
+
+- inspeções são calculadas apenas no host e o policial é replicado ao convidado;
+- aviso, porta, aprovação, multa e confisco compartilham um único resultado;
+- compras de melhorias solicitadas por qualquer jogador são validadas e cobradas no host;
+- melhorias instaladas são replicadas exatamente, mesmo quando os saves locais eram diferentes;
+- somente o host grava a progressão compartilhada; o cliente restaura seu save local ao sair;
+- protocolo atualizado para `farmacia-coop-mp8`.
+
+### Multiplayer — MP8.1 para até quatro jogadores
+
+- lobby privado agora aceita host e até três convidados;
+- quatro posições de entrada e quatro cores identificam o roster;
+- distribuição de slots usa IDs ordenados e permanece igual em todas as máquinas;
+- economia, itens, clientes, laboratório, inspeções e melhorias continuam sob autoridade do host;
+- protocolo atualizado para `farmacia-coop-mp8-4p`.
+
+### Multiplayer — MP9 validada
+
+- item carregado por convidado desconectado é solto uma única vez pelo host;
+- jogadores restantes não são teleportados quando o roster diminui;
+- host continua jogando após a saída de qualquer convidado;
+- queda do host limpa lobby, transporte e réplicas no cliente e abre novamente o menu;
+- convidado restaura seu save local ao retornar ao modo solo;
+- uma nova sessão pode ser criada sem reiniciar o jogo;
+- protocolo atualizado para `farmacia-coop-mp9-4p`.
+- correção MP9: entrada de novos peers posiciona somente quem acabou de conectar; host e jogadores já presentes não são movidos.
+
+### Multiplayer — MP10 validada — RC1
+
+- `F3` exibe RTT médio/máximo e contadores de RPCs aceitos/limitados;
+- host limita rajadas por peer e categoria sem retirar as validações autoritativas existentes;
+- pegar, soltar, estocar, desempacotar, comprar, entregar, fabricar e melhorar possuem proteção contra repetição;
+- protocolo atualizado para `farmacia-coop-mp10-4p`;
+- validação manual aprovada pelo usuário; versão consolidada como `0.3.0-mp10-rc1`.
+- exportação Windows/Steam agora possui script reproduzível com smoke tests e verificação do pacote.
+
+### Multiplayer — RC2: suavização visual do cliente
+
+- snapshots móveis passaram de 10 Hz para 20 Hz;
+- clientes e policial interpolam posição/rotação a cada frame;
+- clientes remotos agora executam o feedback visual de caminhada;
+- porta do laboratório interpola a posição recebida em vez de saltar entre snapshots;
+- caldeira mantém autoridade no host, mas interpola timer, cooldown e estabilidade localmente;
+- prensa mantém processamento visual e tween do acionamento no cliente;
+- primeiro snapshot posiciona NPCs imediatamente, evitando deslocamento desde a origem.
+
+### Menu inicial e acesso por código
+
+- o projeto agora abre em um menu principal com `Jogar` e `Conectar a um host`;
+- `Jogar` inicia a farmácia normalmente em modo solo, preservando a criação posterior de lobby pela tecla `L`;
+- `Conectar a um host` aceita o código numérico da sala antes de carregar a farmácia;
+- a conexão pendente só é iniciada após a cena jogável estar pronta, preservando os componentes de sincronização;
+- ao criar ou entrar em uma sala, o código aparece no menu cooperativo dentro do jogo;
+- o próprio botão com o código e o botão auxiliar de cópia enviam o número para a área de transferência do sistema.
+
+### Multiplayer — MP1 implementada
+
+- `SteamBootstrap` é carregado antes da cena principal;
+- App ID de teste `480` é configurado somente no ambiente de desenvolvimento;
+- callbacks Steam são processados quando a inicialização tem sucesso;
+- nome, Steam ID e estado aparecem no painel `F3`;
+- Godot oficial sem a extensão continua iniciando normalmente em modo solo;
+- GodotSteam sem acesso ao cliente também retorna ao modo solo com a causa exibida;
+- falta confirmar manualmente a identidade real executando o editor GodotSteam com o cliente Steam aberto.
+
 ## Estado atual
 
 As fases 0 a 14 do `AGENTS.md` e as etapas V2.0 a V2.12 foram implementadas. A V2 está tecnicamente completa e pronta para playtest prolongado; os números finais continuam sujeitos às métricas de partidas reais.

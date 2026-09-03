@@ -10,9 +10,11 @@ extends RigidBody3D
 @onready var name_label: Label3D = %NameLabel
 
 var _safe_transform: Transform3D
+var network_item_id: int = 0
 
 
 func _ready() -> void:
+	add_to_group("network_world_item")
 	interactable.interacted.connect(_on_interacted)
 	_apply_item_data()
 	_safe_transform = global_transform

@@ -30,6 +30,8 @@ var _cooldown_remaining: float = 0.0
 var _stability: float = 0.0
 var _stir_step_index: int = 0
 var _stir_step_remaining: float = 0.0
+var _network_proxy: bool = false
+var _network_target_stability: float = 0.0
 
 
 func _ready() -> void:
@@ -40,6 +42,14 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _network_proxy:
+		if _cooldown_remaining > 0.0:
+			_cooldown_remaining = maxf(_cooldown_remaining - delta, 0.0)
+		elif is_crafting:
+			_craft_remaining = maxf(_craft_remaining - delta, 0.0)
+		_stability = move_toward(_stability, _network_target_stability, delta * 1.5)
+		_update_network_visual()
+		return
 	if _cooldown_remaining > 0.0:
 		_cooldown_remaining = maxf(_cooldown_remaining - delta, 0.0)
 		status_label.text = "CALDEIRA EM RECUPERAÇÃO\n%.1fs" % _cooldown_remaining
@@ -80,6 +90,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("stir_right"):
 		direction = 1
 	if direction == 0 or not _player_is_nearby():
+		return
+	var network_lab := get_node_or_null("/root/NetworkLabState")
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_lab != null and network_session != null and network_session._steam_peer != null:
+		network_lab.request_stir(direction)
+		return
+	network_authority_stir(direction)
+
+func network_authority_stir(direction: int) -> void:
+	if not is_crafting or _failure_pending or active_recipe == null or direction == 0:
 		return
 	var correct := direction == _required_stir_direction()
 	if correct:
@@ -124,6 +144,11 @@ func get_contextual_interaction_text() -> String:
 
 
 func _on_interacted(player: PharmacyPlayer) -> void:
+	var network_lab := get_node_or_null("/root/NetworkLabState")
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_lab != null and network_session != null and network_session._steam_peer != null:
+		network_lab.request_cauldron_interaction()
+		return
 	var carry := player.get_node_or_null("CarryController") as CarryController
 	if carry == null:
 		return
@@ -137,6 +162,34 @@ func _on_interacted(player: PharmacyPlayer) -> void:
 			_start_failure()
 		else:
 			_remove_to(carry)
+
+func network_authority_interact(peer_id: int, world_state: Node) -> void:
+	if is_crafting or _cooldown_remaining > 0.0 or world_state == null:
+		return
+	var carried := world_state.get_carried_item(peer_id) as WorldItem
+	if carried != null:
+		var slot_index := _first_empty_slot()
+		if carried.item_data == null or carried.item_data.category != ItemData.Category.INGREDIENT or slot_index < 0:
+			return
+		var item := world_state.authority_store_carried(peer_id, slots[slot_index].global_transform) as WorldItem
+		if item != null:
+			ingredients[slot_index] = item
+			ingredient_inserted.emit(item, slot_index)
+			_update_status()
+		return
+	var matched_recipe := _find_matching_recipe()
+	if matched_recipe != null:
+		_start_craft(matched_recipe)
+	elif _ingredient_count() >= 2:
+		_start_failure()
+	else:
+		var slot_index := _last_occupied_slot()
+		if slot_index >= 0:
+			var item := ingredients[slot_index]
+			if world_state.authority_pick_up_item(peer_id, item.network_item_id):
+				ingredients[slot_index] = null
+				ingredient_removed.emit(item, slot_index)
+				_update_status()
 
 
 func _insert_from(carry: CarryController) -> void:
@@ -300,6 +353,76 @@ func _spawn_explosion() -> CraftingExplosion:
 	get_parent().add_child(explosion)
 	explosion.global_position = global_position + Vector3.UP * 0.7
 	return explosion
+
+func spawn_network_explosion() -> void:
+	var explosion := _spawn_explosion()
+	if explosion != null:
+		explosion_triggered.emit(explosion)
+
+func get_network_snapshot() -> Dictionary:
+	var ingredient_ids: Array[int] = []
+	for item: WorldItem in ingredients:
+		ingredient_ids.append(item.network_item_id if item != null else 0)
+	return {
+		"ingredients": ingredient_ids,
+		"crafting": is_crafting,
+		"recipe_path": active_recipe.resource_path if active_recipe != null else "",
+		"remaining": _craft_remaining,
+		"failure": _failure_pending,
+		"cooldown": _cooldown_remaining,
+		"stability": _stability,
+		"step": _stir_step_index,
+	}
+
+func apply_network_snapshot(data: Dictionary, world_state: Node) -> void:
+	if world_state == null:
+		return
+	var ids: Array = data.get("ingredients", [])
+	for index: int in range(ingredients.size()):
+		var item_id := int(ids[index]) if index < ids.size() else 0
+		ingredients[index] = world_state.get_item_by_id(item_id) if item_id > 0 else null
+	var was_crafting := is_crafting
+	var previous_recipe := active_recipe
+	is_crafting = bool(data.get("crafting", false))
+	var recipe_path := str(data.get("recipe_path", ""))
+	active_recipe = load(recipe_path) as RecipeData if not recipe_path.is_empty() else null
+	_craft_remaining = float(data.get("remaining", 0.0))
+	_failure_pending = bool(data.get("failure", false))
+	_cooldown_remaining = float(data.get("cooldown", 0.0))
+	_network_target_stability = float(data.get("stability", 0.0))
+	if not was_crafting and is_crafting:
+		_stability = _network_target_stability
+	_stir_step_index = int(data.get("step", 0))
+	for item: WorldItem in ingredients:
+		if item != null:
+			item.visible = not is_crafting
+	_update_network_visual()
+	if not was_crafting and is_crafting and active_recipe != null:
+		craft_started.emit(active_recipe)
+	elif was_crafting and not is_crafting and previous_recipe != null:
+		craft_completed.emit(previous_recipe, null)
+
+func apply_network_stir_feedback(correct: bool) -> void:
+	_show_stir_feedback(correct, 0)
+
+func set_network_proxy(value: bool) -> void:
+	_network_proxy = value
+	if not value:
+		_network_target_stability = _stability
+
+func _update_network_visual() -> void:
+	if _cooldown_remaining > 0.0:
+		status_label.text = "CALDEIRA EM RECUPERAÇÃO\n%.1fs" % _cooldown_remaining
+		_set_progress(_cooldown_remaining / cooldown_time, Color("e27954"))
+	elif _failure_pending:
+		status_label.text = "MISTURA INSTÁVEL!\n%.1fs" % _craft_remaining
+		_set_progress(_craft_remaining / failure_warning_time, Color("ff493d"))
+	elif is_crafting and active_recipe != null:
+		var direction_text := "[Q] MEXER À ESQUERDA" if _required_stir_direction() < 0 else "[R] MEXER À DIREITA"
+		status_label.text = "%s\n%s • %.0f%% • %.1fs" % [active_recipe.display_name.to_upper(), direction_text, _stability * 100.0, _craft_remaining]
+		_set_progress(_stability, Color("ef4f4f").lerp(Color("55e79c"), _stability))
+	else:
+		_update_status()
 
 
 func debug_trigger_explosion() -> bool:

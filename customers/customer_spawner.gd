@@ -121,3 +121,17 @@ func debug_spawn_customer() -> bool:
 		return false
 	_spawn_customer()
 	return true
+
+func add_network_customer(customer: PharmacyCustomer) -> void:
+	if customer == null or active_customers.has(customer):
+		return
+	active_customers.append(customer)
+	active_customer = active_customers[0]
+	customer_spawned.emit(customer)
+	active_customer_changed.emit(active_customer)
+
+func remove_network_customer(customer: PharmacyCustomer) -> void:
+	active_customers.erase(customer)
+	active_customer = active_customers[0] if not active_customers.is_empty() else null
+	customer_departed.emit(customer)
+	active_customer_changed.emit(active_customer)

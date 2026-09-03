@@ -6,6 +6,7 @@ signal item_retrieved(item: WorldItem, slot_index: int)
 
 @export var accepts_categories: Array[ItemData.Category] = [ItemData.Category.MEDICINE, ItemData.Category.CRAFTED_PRODUCT]
 @export var storage_name: String = "prateleira"
+@export var network_shelf_id: StringName
 
 @onready var status_label: Label3D = %StatusLabel
 
@@ -13,6 +14,7 @@ var slots: Array[ShelfSlot] = []
 
 func _ready() -> void:
 	add_to_group("storage_feedback")
+	add_to_group("network_shelf")
 	for child: Node in %Slots.get_children():
 		var slot := child as ShelfSlot
 		if slot != null:
@@ -73,3 +75,6 @@ func _update_status() -> void:
 		if slot.stored_item != null:
 			occupied += 1
 	status_label.text = "%s\n%d / %d" % [storage_name.to_upper(), occupied, slots.size()]
+
+func refresh_status() -> void:
+	_update_status()

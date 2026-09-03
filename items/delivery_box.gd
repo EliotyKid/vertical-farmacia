@@ -35,6 +35,19 @@ func _on_interacted(player: PharmacyPlayer) -> void:
 	if not _has_been_carried:
 		carry.try_pick_up(self)
 		return
+	var network_state := get_node_or_null("/root/NetworkWorldState")
+	if network_state != null and network_state.is_network_active():
+		network_state.request_unpack(self, player)
+		return
+	_unpack()
+
+func has_been_carried() -> bool:
+	return _has_been_carried
+
+func set_has_been_carried(value: bool) -> void:
+	_has_been_carried = value
+
+func authority_unpack() -> void:
 	_unpack()
 
 func get_display_name() -> String:

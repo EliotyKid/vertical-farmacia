@@ -44,6 +44,11 @@ var _walk_feedback_time: float = 0.0
 var _patience_remaining: float
 var archetype: Archetype = Archetype.COMMON
 var archetype_label: String = "COMUM"
+var network_customer_id: int = 0
+var remote_proxy: bool = false
+var _remote_position: Vector3
+var _remote_yaw: float = 0.0
+var _has_network_snapshot: bool = false
 
 
 func setup(counter_target: Vector3, exit_target: Vector3) -> void:
@@ -78,10 +83,20 @@ func _ready() -> void:
 	$Interactable.interacted.connect(_on_interacted)
 	_apply_customer_visual()
 	_update_state_label()
-	call_deferred("_change_state", State.WALKING_TO_COUNTER)
+	if remote_proxy:
+		_remote_position = global_position
+	else:
+		call_deferred("_change_state", State.WALKING_TO_COUNTER)
 
 
 func _physics_process(delta: float) -> void:
+	if remote_proxy:
+		var smoothing := 1.0 - exp(-18.0 * delta)
+		global_position = global_position.lerp(_remote_position, smoothing)
+		rotation.y = lerp_angle(rotation.y, _remote_yaw, smoothing)
+		_update_walk_feedback(delta)
+		_update_patience_visual()
+		return
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 	else:
@@ -199,6 +214,11 @@ func _leave_after_delay(delay: float) -> void:
 func _on_interacted(player: PharmacyPlayer) -> void:
 	if current_state != State.ORDER_ACTIVE or current_order == null:
 		return
+	var network_game_state := get_node_or_null("/root/NetworkGameState")
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_customer_id > 0 and network_game_state != null and network_session != null and network_session._steam_peer != null:
+		network_game_state.request_customer_delivery(network_customer_id)
+		return
 	var carry := player.get_node_or_null("CarryController") as CarryController
 	if carry == null or carry.current_item == null:
 		return
@@ -217,6 +237,57 @@ func _on_interacted(player: PharmacyPlayer) -> void:
 	current_order = null
 	_wait_remaining = 0.8
 	await get_tree().create_timer(_wait_remaining).timeout
+	_change_state(State.LEAVING)
+
+func get_patience_remaining() -> float:
+	return _patience_remaining
+
+func apply_network_snapshot(data: Dictionary) -> void:
+	if not remote_proxy:
+		return
+	_remote_position = data.get("position", global_position)
+	_remote_yaw = float(data.get("yaw", rotation.y))
+	if not _has_network_snapshot:
+		global_position = _remote_position
+		rotation.y = _remote_yaw
+		_has_network_snapshot = true
+	_patience_remaining = float(data.get("patience_remaining", patience_duration))
+	var next_state := int(data.get("state", int(current_state))) as State
+	var previous_state := current_state
+	if next_state == State.ORDER_ACTIVE and current_order == null and requested_item != null:
+		current_order = CustomerOrder.new()
+		current_order.requested_item = requested_item
+		current_order.quantity = 1
+		current_order.reward = order_reward
+	current_state = next_state
+	_update_state_label()
+	_update_patience_visual()
+	if previous_state != current_state:
+		state_changed.emit(self, current_state)
+		if current_state == State.ORDER_ACTIVE and current_order != null:
+			order_created.emit(self, current_order)
+		elif current_state == State.RECEIVING and current_order != null:
+			order_completed.emit(self, current_order)
+			current_order = null
+		elif current_state == State.COMPLAINING and current_order != null:
+			order_abandoned.emit(self, current_order)
+			current_order = null
+
+func authority_reject_item(item: ItemData) -> void:
+	delivery_rejected.emit(self, item)
+	_play_reaction(false)
+
+func authority_complete_order(wallet: Wallet) -> void:
+	if current_state != State.ORDER_ACTIVE or current_order == null:
+		return
+	var completed_order := current_order
+	_change_state(State.RECEIVING)
+	if wallet != null:
+		wallet.add_money(completed_order.reward)
+	order_completed.emit(self, completed_order)
+	_play_reaction(true)
+	current_order = null
+	await get_tree().create_timer(0.8).timeout
 	_change_state(State.LEAVING)
 
 

@@ -21,6 +21,15 @@ enum State {
 var current_state: State = State.OPEN
 var _closed_position: Vector3
 var _movement_tween: Tween
+var _network_target_position: Vector3
+var _network_proxy: bool = false
+var _has_network_snapshot: bool = false
+
+func _process(delta: float) -> void:
+	if not _network_proxy:
+		return
+	var smoothing := 1.0 - exp(-22.0 * delta)
+	door_body.position = door_body.position.lerp(_network_target_position, smoothing)
 
 func _ready() -> void:
 	add_to_group("lab_door")
@@ -53,12 +62,36 @@ func is_lab_hidden() -> bool:
 	return current_state == State.CLOSED
 
 func _on_interacted(_player: PharmacyPlayer) -> void:
+	var network_lab := get_node_or_null("/root/NetworkLabState")
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_lab != null and network_session != null and network_session._steam_peer != null:
+		network_lab.request_door_toggle()
+		return
+	network_authority_toggle()
+
+func network_authority_toggle() -> void:
 	if current_state == State.OPEN:
 		_move_door(true)
 	elif current_state == State.CLOSED:
 		_move_door(false)
 
+func get_network_snapshot() -> Dictionary:
+	return {"state": int(current_state), "position": door_body.position}
+
+func apply_network_snapshot(data: Dictionary) -> void:
+	if not _network_proxy:
+		_network_target_position = door_body.position
+	_network_proxy = true
+	current_state = int(data.get("state", int(current_state))) as State
+	_network_target_position = data.get("position", door_body.position)
+	if not _has_network_snapshot:
+		door_body.position = _network_target_position
+		_has_network_snapshot = true
+	_set_panels_enabled(current_state == State.OPEN or current_state == State.CLOSED)
+	_update_visual_state()
+
 func _move_door(close_door: bool) -> void:
+	_network_proxy = false
 	if _movement_tween != null and _movement_tween.is_valid():
 		_movement_tween.kill()
 	current_state = State.CLOSING if close_door else State.OPENING

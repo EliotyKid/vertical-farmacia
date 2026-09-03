@@ -33,12 +33,16 @@ func _on_customer_spawned(customer: PharmacyCustomer) -> void:
 		customer.order_abandoned.connect(_on_order_abandoned)
 
 func _on_order_completed(_customer: PharmacyCustomer, order: CustomerOrder) -> void:
+	if _is_network_client():
+		return
 	completed_orders += 1
 	total_revenue += order.reward
 	_update_demand()
 	progress_changed.emit(completed_orders, abandoned_orders, total_revenue)
 
 func _on_order_abandoned(_customer: PharmacyCustomer, _order: CustomerOrder) -> void:
+	if _is_network_client():
+		return
 	abandoned_orders += 1
 	var player := get_tree().get_first_node_in_group("player") as PharmacyPlayer
 	if player != null:
@@ -66,6 +70,17 @@ func restore_progress(saved_completed: int, saved_abandoned: int, saved_revenue:
 	total_revenue = maxi(saved_revenue, 0)
 	_update_demand()
 	progress_changed.emit(completed_orders, abandoned_orders, total_revenue)
+
+func apply_network_progress(network_completed: int, network_abandoned: int, network_revenue: int) -> void:
+	completed_orders = maxi(network_completed, 0)
+	abandoned_orders = maxi(network_abandoned, 0)
+	total_revenue = maxi(network_revenue, 0)
+	progress_changed.emit(completed_orders, abandoned_orders, total_revenue)
+	demand_level_changed.emit(get_demand_level(), get_demand_label())
+
+func _is_network_client() -> bool:
+	var session := get_node_or_null("/root/NetworkSession")
+	return session != null and session._steam_peer != null and not session.is_session_host
 
 func _update_demand(spawner: CustomerSpawner = null) -> void:
 	if spawner == null:

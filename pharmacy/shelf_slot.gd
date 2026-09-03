@@ -39,6 +39,10 @@ func get_contextual_interaction_text() -> String:
 func _on_interacted(player: PharmacyPlayer) -> void:
 	if shelf == null:
 		return
+	var network_state := get_node_or_null("/root/NetworkWorldState")
+	if network_state != null and network_state.is_network_active():
+		network_state.request_shelf_interaction(player, shelf.network_shelf_id, slot_index)
+		return
 	var carry := player.get_node_or_null("CarryController") as CarryController
 	if carry == null:
 		return

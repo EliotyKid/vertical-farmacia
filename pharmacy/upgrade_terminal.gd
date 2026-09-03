@@ -18,9 +18,14 @@ signal upgrade_purchased(upgrade_id: StringName)
 var purchased_upgrades: Dictionary = {}
 var _active_player: PharmacyPlayer
 var _wallet: Wallet
+var _spawned_upgrades: Dictionary = {}
+var _default_delivery_time: float = 20.0
 
 func _ready() -> void:
 	add_to_group("upgrade_terminal")
+	var supplier := get_tree().get_first_node_in_group("supplier_terminal") as SupplierTerminal
+	if supplier != null:
+		_default_delivery_time = supplier.delivery_time
 	%Interactable.interacted.connect(_on_interacted)
 	%ShelfButton.pressed.connect(_purchase_upgrade.bind(&"extra_shelf"))
 	%PressButton.pressed.connect(_purchase_upgrade.bind(&"manual_press"))
@@ -59,25 +64,50 @@ func close_menu() -> void:
 func _purchase_upgrade(upgrade_id: StringName) -> void:
 	if _wallet == null or purchased_upgrades.has(upgrade_id):
 		return
+	var network_progression := get_node_or_null("/root/NetworkProgressionState")
+	var network_session := get_node_or_null("/root/NetworkSession")
+	if network_progression != null and network_session != null and network_session._steam_peer != null:
+		network_progression.request_upgrade(upgrade_id)
+		feedback_label.text = "Melhoria solicitada ao host."
+		return
+	authority_purchase_upgrade(upgrade_id, _wallet)
+
+func authority_purchase_upgrade(upgrade_id: StringName, wallet: Wallet) -> bool:
+	if wallet == null or purchased_upgrades.has(upgrade_id):
+		return false
 	var price := _get_price(upgrade_id)
-	if not _wallet.try_spend(price):
-		feedback_label.text = "Dinheiro insuficiente: faltam $%d." % maxi(price - _wallet.money, 0)
-		return
+	if price <= 0 or not wallet.try_spend(price):
+		feedback_label.text = "Dinheiro insuficiente: faltam $%d." % maxi(price - wallet.money, 0)
+		return false
 	if not _apply_upgrade(upgrade_id):
-		_wallet.add_money(price)
+		wallet.add_money(price)
 		feedback_label.text = "Não foi possível instalar esta melhoria."
-		return
+		return false
 	purchased_upgrades[upgrade_id] = true
 	feedback_label.text = "Melhoria instalada!"
 	upgrade_purchased.emit(upgrade_id)
 	_update_buttons()
+	return true
+
+func apply_network_upgrades(upgrade_ids: Array[StringName]) -> void:
+	set_exact_upgrades(upgrade_ids)
+
+func set_exact_upgrades(upgrade_ids: Array[StringName]) -> void:
+	for current: Variant in purchased_upgrades.keys().duplicate():
+		var current_id := StringName(current)
+		if current_id not in upgrade_ids:
+			_remove_upgrade(current_id)
+	restore_upgrades(upgrade_ids)
+
+func show_network_upgrade_result(accepted: bool) -> void:
+	feedback_label.text = "Melhoria instalada pelo host." if accepted else "Melhoria recusada pelo host."
 
 func _apply_upgrade(upgrade_id: StringName) -> bool:
 	match upgrade_id:
 		&"extra_shelf":
-			return _spawn_at_marker(shelf_scene, "upgrade_shelf_spawn")
+			return _spawn_at_marker(shelf_scene, "upgrade_shelf_spawn", upgrade_id)
 		&"manual_press":
-			var installed := _spawn_at_marker(press_scene, "upgrade_press_spawn")
+			var installed := _spawn_at_marker(press_scene, "upgrade_press_spawn", upgrade_id)
 			if installed and press_product != null:
 				var spawner := get_tree().get_first_node_in_group("customer_spawner") as CustomerSpawner
 				if spawner != null and press_product not in spawner.order_sequence:
@@ -108,14 +138,33 @@ func get_purchased_upgrade_ids() -> Array[String]:
 	result.sort()
 	return result
 
-func _spawn_at_marker(scene: PackedScene, group_name: StringName) -> bool:
+func _spawn_at_marker(scene: PackedScene, group_name: StringName, upgrade_id: StringName) -> bool:
 	var marker := get_tree().get_first_node_in_group(group_name) as Marker3D
 	if scene == null or marker == null:
 		return false
 	var instance := scene.instantiate() as Node3D
+	if instance is PharmacyShelf:
+		(instance as PharmacyShelf).network_shelf_id = &"upgrade_extra_shelf"
 	marker.get_parent().add_child(instance)
 	instance.global_transform = marker.global_transform
+	_spawned_upgrades[upgrade_id] = instance
 	return true
+
+func _remove_upgrade(upgrade_id: StringName) -> void:
+	var instance := _spawned_upgrades.get(upgrade_id) as Node
+	if is_instance_valid(instance):
+		instance.queue_free()
+	_spawned_upgrades.erase(upgrade_id)
+	if upgrade_id == &"manual_press" and press_product != null:
+		var spawner := get_tree().get_first_node_in_group("customer_spawner") as CustomerSpawner
+		if spawner != null:
+			spawner.order_sequence.erase(press_product)
+	elif upgrade_id == &"express_delivery":
+		var supplier := get_tree().get_first_node_in_group("supplier_terminal") as SupplierTerminal
+		if supplier != null:
+			supplier.delivery_time = _default_delivery_time
+	purchased_upgrades.erase(upgrade_id)
+	_update_buttons()
 
 func _get_price(upgrade_id: StringName) -> int:
 	match upgrade_id:

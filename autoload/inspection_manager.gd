@@ -26,6 +26,8 @@ func _ready() -> void:
 	_emit_status("Fiscalização tranquila", false)
 
 func _process(delta: float) -> void:
+	if _is_network_client():
+		return
 	if current_state == State.ACTIVE:
 		return
 	_remaining = maxf(_remaining - delta, 0.0)
@@ -106,6 +108,8 @@ func _emit_status(status: String, urgent: bool) -> void:
 
 
 func debug_schedule_inspection(seconds: float = 5.0) -> bool:
+	if _is_network_client():
+		return false
 	if current_state == State.ACTIVE:
 		return false
 	_remaining = maxf(seconds, 1.0)
@@ -113,3 +117,27 @@ func debug_schedule_inspection(seconds: float = 5.0) -> bool:
 	_last_status = ""
 	_emit_status("POLÍCIA EM %.0fs • FECHE O LABORATÓRIO" % _remaining, true)
 	return true
+
+func get_network_snapshot() -> Dictionary:
+	return {
+		"state": int(current_state),
+		"remaining": _remaining,
+		"status": _last_status,
+		"urgent": current_state != State.WAITING,
+		"inspector": _active_inspector.get_network_snapshot() if is_instance_valid(_active_inspector) else {},
+	}
+
+func apply_network_snapshot(data: Dictionary) -> void:
+	current_state = int(data.get("state", int(current_state))) as State
+	_remaining = float(data.get("remaining", _remaining))
+	_emit_status(str(data.get("status", _last_status)), bool(data.get("urgent", false)))
+
+func get_active_inspector() -> PoliceInspector:
+	return _active_inspector if is_instance_valid(_active_inspector) else null
+
+func set_network_inspector(inspector: PoliceInspector) -> void:
+	_active_inspector = inspector
+
+func _is_network_client() -> bool:
+	var session := get_node_or_null("/root/NetworkSession")
+	return session != null and session._steam_peer != null and not session.is_session_host

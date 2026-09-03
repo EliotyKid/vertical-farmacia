@@ -17,6 +17,10 @@ var inspection_position: Vector3
 var exit_position: Vector3
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _entry_remaining: float
+var remote_proxy: bool = false
+var _remote_position: Vector3
+var _remote_yaw: float = 0.0
+var _has_network_snapshot: bool = false
 
 func setup(inspection_target: Vector3, exit_target: Vector3) -> void:
 	inspection_position = inspection_target
@@ -24,6 +28,11 @@ func setup(inspection_target: Vector3, exit_target: Vector3) -> void:
 	_entry_remaining = maximum_entry_time
 
 func _physics_process(delta: float) -> void:
+	if remote_proxy:
+		var smoothing := 1.0 - exp(-18.0 * delta)
+		global_position = global_position.lerp(_remote_position, smoothing)
+		rotation.y = lerp_angle(rotation.y, _remote_yaw, smoothing)
+		return
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 	else:
@@ -78,3 +87,23 @@ func _horizontal_distance_to(target: Vector3) -> float:
 	var offset := target - global_position
 	offset.y = 0.0
 	return offset.length()
+
+func get_network_snapshot() -> Dictionary:
+	return {
+		"position": global_position,
+		"yaw": rotation.y,
+		"state": int(current_state),
+		"label": state_label.text,
+		"color": state_label.modulate,
+	}
+
+func apply_network_snapshot(data: Dictionary) -> void:
+	_remote_position = data.get("position", global_position)
+	_remote_yaw = float(data.get("yaw", rotation.y))
+	if not _has_network_snapshot:
+		global_position = _remote_position
+		rotation.y = _remote_yaw
+		_has_network_snapshot = true
+	current_state = int(data.get("state", int(current_state))) as State
+	state_label.text = str(data.get("label", state_label.text))
+	state_label.modulate = data.get("color", state_label.modulate)

@@ -24,9 +24,19 @@ script = ExtResource("1_player")
 shape = SubResource("CapsuleShape_player")
 
 [node name="BodyMesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
 mesh = SubResource("CapsuleMesh_player")
 material_override = SubResource("PlayerMaterial")
 cast_shadow = 1
+
+[node name="NetworkNameLabel" type="Label3D" parent="."]
+unique_name_in_owner = true
+position = Vector3(0, 1.25, 0)
+text = "Jogador remoto"
+font_size = 34
+outline_size = 8
+billboard = 1
+no_depth_test = true
 
 [node name="Head" type="Node3D" parent="."]
 unique_name_in_owner = true
@@ -49,10 +59,12 @@ unique_name_in_owner = true
 position = Vector3(0.42, -0.32, -1.15)
 
 [node name="InteractionController" type="Node" parent="." node_paths=PackedStringArray("raycast")]
+unique_name_in_owner = true
 script = ExtResource("2_interaction")
 raycast = NodePath("../Head/Camera3D/InteractionRay")
 
 [node name="CarryController" type="Node" parent="." node_paths=PackedStringArray("hold_marker")]
+unique_name_in_owner = true
 script = ExtResource("3_carry")
 hold_marker = NodePath("../Head/Camera3D/HoldMarker")
 

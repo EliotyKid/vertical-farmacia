@@ -1,0 +1,128 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://multiplayer/coop_lobby_ui.gd" id="1_ui"]
+
+[sub_resource type="StyleBoxFlat" id="LobbyStyle"]
+bg_color = Color(0.035, 0.065, 0.095, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.58, 0.9, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[node name="CoopLobbyUI" type="CanvasLayer"]
+layer = 11
+script = ExtResource("1_ui")
+
+[node name="OpenHint" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 14.0
+offset_right = 180.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.55, 0.78, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 4
+text = "L • COOP STEAM"
+
+[node name="LobbyMenu" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -300.0
+offset_right = 250.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("LobbyStyle")
+
+[node name="Margin" type="MarginContainer" parent="LobbyMenu"]
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 26
+theme_override_constants/margin_bottom = 22
+
+[node name="Content" type="VBoxContainer" parent="LobbyMenu/Margin"]
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="LobbyMenu/Margin/Content"]
+theme_override_colors/font_color = Color(0.55, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "Cooperativo Steam — Teste"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="LobbyMenu/Margin/Content"]
+text = "Lobby privado para até quatro jogadores\nApp ID de desenvolvimento: 480"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+theme_override_colors/font_color = Color(1, 0.85, 0.48, 1)
+text = "Verificando Steam..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="NetworkStatusLabel" type="Label" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.45, 0.9, 0.72, 1)
+text = "Rede: inativa • modo solo"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="MembersLabel" type="Label" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 70)
+text = "Jogadores:\n—"
+horizontal_alignment = 1
+
+[node name="LobbyIdLabel" type="Button" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.55, 0.8, 1, 1)
+text = "Código da sala: —"
+disabled = true
+
+[node name="CopyButton" type="Button" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Copiar código do lobby"
+disabled = true
+
+[node name="CreateButton" type="Button" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Criar lobby privado"
+
+[node name="InviteButton" type="Button" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Convidar amigo pela Steam"
+disabled = true
+
+[node name="JoinSeparator" type="HSeparator" parent="LobbyMenu/Margin/Content"]
+
+[node name="JoinInstruction" type="Label" parent="LobbyMenu/Margin/Content"]
+text = "Ou entre usando o código enviado pelo host:"
+horizontal_alignment = 1
+
+[node name="JoinCodeInput" type="LineEdit" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+placeholder_text = "Cole o código numérico do lobby"
+
+[node name="JoinButton" type="Button" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Entrar pelo código"
+
+[node name="LeaveButton" type="Button" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Sair do lobby"
+disabled = true
+
+[node name="CloseButton" type="Button" parent="LobbyMenu/Margin/Content"]
+unique_name_in_owner = true
+text = "Fechar"

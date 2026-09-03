@@ -11,7 +11,7 @@ unique_name_in_owner = true
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 330.0
-offset_bottom = 355.0
+offset_bottom = 385.0
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 theme_override_constants/margin_left = 12
@@ -31,6 +31,18 @@ text = "F4: resetar progressão"
 [node name="CheatHint" type="Label" parent="Panel/Margin/Labels"]
 theme_override_colors/font_color = Color(1, 0.82, 0.5, 1)
 text = "F5: +$100\nF6: gerar cliente\nF7: fiscalização em 5s\nB: forçar explosão"
+
+[node name="SteamLabel" type="Label" parent="Panel/Margin/Labels"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.45, 0.75, 1, 1)
+text = "Steam: verificando..."
+autowrap_mode = 2
+
+[node name="NetworkLabel" type="Label" parent="Panel/Margin/Labels"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.45, 0.9, 0.72, 1)
+text = "Rede: inativa"
+autowrap_mode = 2
 
 [node name="FPSLabel" type="Label" parent="Panel/Margin/Labels"]
 unique_name_in_owner = true

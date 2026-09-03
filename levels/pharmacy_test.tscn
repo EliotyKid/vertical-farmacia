@@ -37,6 +37,8 @@
 [ext_resource type="Resource" path="res://data/recipes/nimbus_elixir.tres" id="41_recipe_elixir"]
 [ext_resource type="Resource" path="res://data/recipes/lunar_compound.tres" id="42_recipe_lunar"]
 [ext_resource type="Resource" path="res://data/recipes/nimbus_tablet.tres" id="43_recipe_tablet"]
+[ext_resource type="PackedScene" path="res://multiplayer/coop_lobby_ui.tscn" id="44_coop_ui"]
+[ext_resource type="Script" path="res://multiplayer/network_player_spawner.gd" id="45_player_spawner"]
 
 [node name="PharmacyTest" type="Node3D" unique_id=786112716]
 script = ExtResource("1_level")
@@ -61,21 +63,46 @@ script = ExtResource("37_metrics")
 
 [node name="HUD" parent="." unique_id=1028629276 instance=ExtResource("20_hud")]
 
+[node name="CoopLobbyUI" parent="." instance=ExtResource("44_coop_ui")]
+
 [node name="Player" parent="." unique_id=1440875414 instance=ExtResource("3_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 8)
+
+[node name="HostPlayerSpawn" type="Marker3D" parent="."]
+position = Vector3(-1, 1, 8)
+
+[node name="ClientPlayerSpawn" type="Marker3D" parent="."]
+position = Vector3(1, 1, 8)
+
+[node name="ClientPlayerSpawn2" type="Marker3D" parent="."]
+position = Vector3(-1, 1, 6.5)
+
+[node name="ClientPlayerSpawn3" type="Marker3D" parent="."]
+position = Vector3(1, 1, 6.5)
+
+[node name="NetworkPlayerSpawner" type="Node" parent="." node_paths=PackedStringArray("host_spawn", "client_spawn", "client_spawn_2", "client_spawn_3")]
+script = ExtResource("45_player_spawner")
+player_scene = ExtResource("3_player")
+host_spawn = NodePath("../HostPlayerSpawn")
+client_spawn = NodePath("../ClientPlayerSpawn")
+client_spawn_2 = NodePath("../ClientPlayerSpawn2")
+client_spawn_3 = NodePath("../ClientPlayerSpawn3")
 
 [node name="Shelves" type="Node3D" parent="." unique_id=1621713537]
 
 [node name="ShelfLeft" parent="Shelves" unique_id=813803631 instance=ExtResource("11_shelf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.7, 1.25, 5.5)
+network_shelf_id = &"shelf_left"
 
 [node name="ShelfRight" parent="Shelves" unique_id=794628406 instance=ExtResource("11_shelf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7, 1.25, 5.5)
+network_shelf_id = &"shelf_right"
 
 [node name="IngredientStorage" parent="Shelves" unique_id=208107468 instance=ExtResource("11_shelf")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.8, 1.25, -7.8)
 accepts_categories = Array[int]([1])
 storage_name = "armazenamento de ingredientes"
+network_shelf_id = &"ingredient_storage"
 
 [node name="LabDoor" parent="." unique_id=534389610 instance=ExtResource("30_lab_door")]
 
